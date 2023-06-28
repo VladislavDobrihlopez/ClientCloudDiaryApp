@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.DiabetesDiary.MySplash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.YourDiabetesDiary</item>
+        <item name="windowSplashScreenBackground">#001E2C</item> <!-- dark theme surface color !-->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/app_logo</item>
+    </style>
+</resources>
