@@ -1,8 +1,10 @@
 # YourDiabetesDiary
 
 ##Stack
--Jetpack compose
--Coroutines
--MongoDb
--Firebase
--Room
+* Multi module architecture
+* MVVM
+* Jetpack compose
+* Coroutines
+* MongoDb
+* Firebase
+* Room
