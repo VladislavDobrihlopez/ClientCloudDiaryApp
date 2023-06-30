@@ -24,7 +24,7 @@ class AuthenticationViewModel : ViewModel() {
 
     fun signInWithMongoAtlas(
         token: String,
-        onSuccess: (Boolean) -> Unit,
+        onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
         viewModelScope.launch {
@@ -33,10 +33,14 @@ class AuthenticationViewModel : ViewModel() {
                     App.Companion.create(Constants.MONGO_DB_APP_ID)
                         .login(Credentials.jwt(token)).loggedIn
                 }
-                setLoading(true)
-                onSuccess(result)
-                delay(500)
-                authenticationState.value = true
+                if (result) {
+                    setLoading(true)
+                    onSuccess()
+                    delay(500)
+                    authenticationState.value = true
+                } else {
+                    onError(Exception("Smth went wrong. User is logged in"))
+                }
             } catch (ex: Exception) {
                 authenticationState.value = false
                 setLoading(false)

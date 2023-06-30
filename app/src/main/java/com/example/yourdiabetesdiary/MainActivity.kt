@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.yourdiabetesdiary.navigation.Screen
@@ -37,6 +38,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             keepDisplayingSplash
         }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             YourDiabetesDiaryTheme {
@@ -68,10 +71,8 @@ class MainActivity : ComponentActivity() {
                                 Log.d("MONGO_ATLAS", token)
                                 viewModel.signInWithMongoAtlas(
                                     token = token,
-                                    onSuccess = { isLoggedInAtlas ->
-                                        if (isLoggedInAtlas) {
-                                            authResultState.addSuccess("Successfully authorized")
-                                        }
+                                    onSuccess = {
+                                        authResultState.addSuccess("Successfully authorized")
                                     },
                                     onError = { error ->
                                         Log.d("MONGO_ATLAS", error.message.toString())
