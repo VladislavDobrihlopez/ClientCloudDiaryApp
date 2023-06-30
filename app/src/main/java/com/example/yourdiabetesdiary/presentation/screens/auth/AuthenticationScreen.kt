@@ -1,7 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.auth
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,10 +17,17 @@ fun AuthenticationScreen(
     oneTapState: OneTapSignInState,
     authResultState: MessageBarState,
     onButtonClick: () -> Unit,
+    onTokenReceived: (String) -> Unit,
+    onReceivingDismissed: (String) -> Unit,
     loadingState: Boolean
 ) {
     Scaffold(content = {
-        ContentWithMessageBar(messageBarState = authResultState) {
+        ContentWithMessageBar(
+            messageBarState = authResultState,
+            errorMaxLines = 3,
+            successMaxLines = 2,
+            visibilityDuration = 5000L
+        ) {
             AuthenticationContent(onClick = onButtonClick, loadingState = loadingState)
         }
     })
@@ -30,10 +36,8 @@ fun AuthenticationScreen(
         state = oneTapState,
         clientId = Constants.GOOGLE_CLOUD_CLIENT_ID,
         onTokenIdReceived = { token ->
-            Log.d("AUTH", token)
-            authResultState.addSuccess("Successfully authorized")
-    }, onDialogDismissed = { message ->
-            Log.d("AUTH", message)
-            authResultState.addError(Exception(message))
+            onTokenReceived(token)
+        }, onDialogDismissed = { message ->
+            onReceivingDismissed(message)
         })
 }
