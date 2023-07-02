@@ -10,6 +10,14 @@ class AppNavState(private val navController: NavController) {
         navController.popBackStack()
         navController.navigate(Screen.Home.route)
     }
+
+    fun navigateToWrite(diaryId: String = "") {
+        if (diaryId.isEmpty()) {
+            navController.navigate(Screen.DiaryEntry.route)
+        } else {
+            navController.navigate(Screen.DiaryEntry.passArgs(diaryId))
+        }
+    }
 }
 
 @Composable

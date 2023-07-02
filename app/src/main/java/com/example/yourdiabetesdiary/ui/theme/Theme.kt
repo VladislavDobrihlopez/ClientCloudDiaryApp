@@ -113,7 +113,7 @@ fun YourDiabetesDiaryTheme(
         window.navigationBarColor = Color.Transparent.toArgb()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = true
+            window.isNavigationBarContrastEnforced = false
         }
 
         val windowsInsetsController = WindowCompat.getInsetsController(window, view)
