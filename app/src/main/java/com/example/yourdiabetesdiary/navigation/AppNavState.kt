@@ -18,6 +18,11 @@ class AppNavState(private val navController: NavController) {
             navController.navigate(Screen.DiaryEntry.passArgs(diaryId))
         }
     }
+
+    fun navigateToAuth() {
+        navController.popBackStack()
+        navController.navigate(Screen.Authentication.route)
+    }
 }
 
 @Composable

@@ -1,15 +1,13 @@
 package com.example.yourdiabetesdiary.navigation
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -17,6 +15,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
@@ -26,6 +25,7 @@ import com.stevdzasan.onetap.rememberOneTapSignInState
 import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SetupNavHost(
@@ -42,9 +42,15 @@ fun SetupNavHost(
         authenticationRoute(keepSplashScreen = keepSplashScreen) {
             navigationState.navigateToHome()
         }
-        homeRoute(keepSplashScreen = keepSplashScreen) {
-            navigationState.navigateToWrite()
-        }
+        homeRoute(
+            keepSplashScreen = keepSplashScreen,
+            navigateToWriteScreen = {
+                navigationState.navigateToWrite()
+            },
+            navigateBackToAuthScreen = {
+                navigationState.navigateToAuth()
+            }
+        )
         diaryRoute()
     }
 }
@@ -95,24 +101,55 @@ private fun NavGraphBuilder.authenticationRoute(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 private fun NavGraphBuilder.homeRoute(
     keepSplashScreen: (Boolean) -> Unit,
-    navigateToWriteScreen: () -> Unit
+    navigateToWriteScreen: () -> Unit,
+    navigateBackToAuthScreen: () -> Unit
 ) {
     composable(route = Screen.Home.route) {
         Log.d("TEST_USER", "home_screen")
         keepSplashScreen(false)
         val scope = rememberCoroutineScope()
+        val navDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val openDialogState = remember {
+            mutableStateOf(false)
+        }
 
         HomeScreen(
-            onMenuClicked = { /*TODO*/ },
+            drawerState = navDrawerState,
+            onMenuClicked = {
+                scope.launch {
+                    navDrawerState.open()
+                }
+            },
             navigateToWriteScreen = {
                 navigateToWriteScreen()
+            },
+            onSignOut = {
+                openDialogState.value = true
             }
         )
-//                scope.launch(Dispatchers.IO) {
-//                    App.create(Constants.MONGO_DB_APP_ID).currentUser?.logOut()
-//                }
+
+        CustomAlertDialog(
+            title = "Sign out dialog",
+            message = "Are you sure you want to sign out from the account?",
+            isDialogOpened = openDialogState,
+            onYesClicked = {
+                scope.launch(Dispatchers.IO) {
+                    val user = App.create(Constants.MONGO_DB_APP_ID).currentUser
+                    if (user != null) {
+                        user.logOut()
+                        withContext(Dispatchers.Main) {
+                            navigateBackToAuthScreen()
+                        }
+                    }
+                }
+            },
+            onDialogClosed = {
+                openDialogState.value = false
+            }
+        )
     }
 }
 
