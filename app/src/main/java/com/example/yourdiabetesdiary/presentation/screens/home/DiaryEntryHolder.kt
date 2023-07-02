@@ -1,5 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,8 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.Mood
+import com.example.yourdiabetesdiary.presentation.components.Gallery
 import com.example.yourdiabetesdiary.ui.theme.Elevation
 import com.example.yourdiabetesdiary.util.toInstant
+import io.realm.kotlin.ext.realmListOf
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
@@ -48,6 +53,9 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
     val localDensity = LocalDensity.current
     val componentHeight = remember {
         mutableStateOf(DEFAULT_LINE_HEIGHT)
+    }
+    val galleryOpened = remember {
+        mutableStateOf(true)
     }
     Row(
         modifier = Modifier
@@ -88,8 +96,36 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
                     style = TextStyle(fontSize = MaterialTheme.typography.bodyMedium.fontSize),
                     overflow = TextOverflow.Ellipsis
                 )
+                if (entry.images.isNotEmpty()) {
+                    GalleryDisplayManager(
+                        isDisplayed = galleryOpened,
+                        onClick = {
+                            galleryOpened.value = !galleryOpened.value
+                        }
+                    )
+                    AnimatedVisibility(visible = galleryOpened.value) {
+                        Column(modifier = Modifier.padding(all = 14.dp)) {
+                            Gallery(images = entry.images)
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun GalleryDisplayManager(isDisplayed: State<Boolean>, onClick: () -> Unit) {
+    TextButton(
+        onClick = {
+            onClick()
+        }
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = if (isDisplayed.value) "Show less" else "Show more",
+            style = TextStyle(fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+        )
     }
 }
 
@@ -140,5 +176,6 @@ fun DiaryEntryHolderPreview() {
         title = "breakfast"
         description = "I've eaten 5 bread units in the morning, injured 12 units of novorapid"
         mood = Mood.Calm.name
+        images = realmListOf("", "")
     }, onClick = {})
 }
