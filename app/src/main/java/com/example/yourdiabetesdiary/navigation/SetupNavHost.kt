@@ -101,7 +101,6 @@ private fun NavGraphBuilder.authenticationRoute(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 private fun NavGraphBuilder.homeRoute(
     keepSplashScreen: (Boolean) -> Unit,
     navigateToWriteScreen: () -> Unit,

@@ -30,7 +30,6 @@ import com.example.yourdiabetesdiary.R
 import com.example.yourdiabetesdiary.presentation.components.DateHeader
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     drawerState: DrawerState,
@@ -52,7 +51,7 @@ fun HomeScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
             }
         }, content = {
-            DateHeader(localDate = LocalDate.now())
+           // DiaryEntryHolder()
         })
     }
 }
