@@ -5,8 +5,10 @@ import io.realm.kotlin.types.ObjectId
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 
 class DiaryEntry: RealmObject {
+    @PrimaryKey
     var _id: ObjectId = ObjectId.create()
     var ownerId: String = ""
     var mood: String = Mood.Neutral.name
