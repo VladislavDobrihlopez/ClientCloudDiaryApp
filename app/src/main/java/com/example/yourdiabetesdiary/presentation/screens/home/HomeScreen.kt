@@ -51,7 +51,9 @@ fun HomeScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
             }
         }, content = {
-           // DiaryEntryHolder()
+            HomeContent(diariesOnSpecificDate = mapOf(), onDiaryClick = { chosedDiary ->
+
+            })
         })
     }
 }
