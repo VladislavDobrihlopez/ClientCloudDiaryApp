@@ -7,7 +7,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-class DiaryEntry: RealmObject {
+open class DiaryEntry: RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId.create()
     var ownerId: String = ""
