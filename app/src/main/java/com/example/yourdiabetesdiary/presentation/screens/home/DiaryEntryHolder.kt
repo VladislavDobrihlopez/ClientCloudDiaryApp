@@ -71,6 +71,7 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
     ) {
         Spacer(modifier = Modifier.width(14.dp))
         Surface(
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .width(2.dp)
                 .height(componentHeight.value + DEFAULT_LINE_HEIGHT),

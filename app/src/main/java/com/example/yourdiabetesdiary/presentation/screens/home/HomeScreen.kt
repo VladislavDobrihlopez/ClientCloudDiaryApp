@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
+import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.presentation.components.DateHeader
 import java.time.LocalDate
 
@@ -51,7 +52,10 @@ fun HomeScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
             }
         }, content = {
-            HomeContent(diariesOnSpecificDate = mapOf(), onDiaryClick = { chosedDiary ->
+            HomeContent(modifier = Modifier.padding(it), diariesOnSpecificDate = mapOf(LocalDate.now() to listOf(DiaryEntry().apply {
+                title = "Breakfast"
+                description = "everything is okay"
+            })), onDiaryClick = { chosedDiary ->
 
             })
         })
