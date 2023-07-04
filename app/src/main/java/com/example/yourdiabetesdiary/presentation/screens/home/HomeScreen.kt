@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,8 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,17 +23,18 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.presentation.components.DateHeader
-import java.time.LocalDate
+import com.example.yourdiabetesdiary.data.repository.DiariesType
+import com.example.yourdiabetesdiary.domain.RequestState
 
 @Composable
 fun HomeScreen(
+    state: State<RequestState<DiariesType>>,
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
     navigateToWriteScreen: () -> Unit,
@@ -52,12 +54,30 @@ fun HomeScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
             }
         }, content = {
-            HomeContent(modifier = Modifier.padding(it), diariesOnSpecificDate = mapOf(LocalDate.now() to listOf(DiaryEntry().apply {
-                title = "Breakfast"
-                description = "everything is okay"
-            })), onDiaryClick = { chosedDiary ->
+            when (val currentState = state.value) {
+                is RequestState.Error -> {
+                    EmptyDataInfo(
+                        title = "Error occurred",
+                        subtitle = currentState.ex.message.toString()
+                    )
+                }
 
-            })
+                RequestState.Idle -> TODO()
+                RequestState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is RequestState.Success -> {
+                    HomeContent(modifier = Modifier.padding(it),
+                        diariesOnSpecificDate = currentState.data,
+                        onDiaryClick = { chosedDiary ->
+
+                        })
+                }
+            }
+
         })
     }
 }

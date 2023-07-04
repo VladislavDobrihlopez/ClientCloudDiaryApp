@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.presentation.components.DateHeader
@@ -45,14 +46,14 @@ fun HomeContent(
             }
         }
     } else {
-        EmptyData()
+        EmptyDataInfo()
     }
 }
 
 @Composable
-private fun EmptyData(
+fun EmptyDataInfo(
     title: String = "No diaries yet",
-    subtitle: String = "Do you mind adding a new one? Tap on the bottom-right bottom"
+    subtitle: String = "Do you mind adding a new one? Tap on the bottom-right button"
 ) {
     Column(
         modifier = Modifier
@@ -62,6 +63,7 @@ private fun EmptyData(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
+            textAlign = TextAlign.Center,
             text = title,
             style = TextStyle(
                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -69,6 +71,7 @@ private fun EmptyData(
             )
         )
         Text(
+            textAlign = TextAlign.Center,
             text = subtitle,
             style = TextStyle(
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,

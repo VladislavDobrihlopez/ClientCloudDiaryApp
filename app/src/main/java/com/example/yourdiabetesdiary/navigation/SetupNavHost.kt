@@ -19,6 +19,7 @@ import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
+import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
 import com.stevdzasan.messagebar.rememberMessageBarState
 import com.stevdzasan.onetap.rememberOneTapSignInState
@@ -115,8 +116,12 @@ private fun NavGraphBuilder.homeRoute(
             mutableStateOf(false)
         }
 
+        val viewModel: HomeViewModel = viewModel()
+        val state = viewModel.diaries
+
         HomeScreen(
             drawerState = navDrawerState,
+            state = state,
             onMenuClicked = {
                 scope.launch {
                     navDrawerState.open()
