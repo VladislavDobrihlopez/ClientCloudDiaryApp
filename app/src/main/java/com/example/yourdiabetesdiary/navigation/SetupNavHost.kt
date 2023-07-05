@@ -1,10 +1,13 @@
 package com.example.yourdiabetesdiary.navigation
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -15,6 +18,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
+import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
@@ -102,6 +107,7 @@ private fun NavGraphBuilder.authenticationRoute(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun NavGraphBuilder.homeRoute(
     keepSplashScreen: (Boolean) -> Unit,
     navigateToWriteScreen: () -> Unit,
@@ -109,7 +115,6 @@ private fun NavGraphBuilder.homeRoute(
 ) {
     composable(route = Screen.Home.route) {
         Log.d("TEST_USER", "home_screen")
-        keepSplashScreen(false)
         val scope = rememberCoroutineScope()
         val navDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val openDialogState = remember {
@@ -119,9 +124,15 @@ private fun NavGraphBuilder.homeRoute(
         val viewModel: HomeViewModel = viewModel()
         val state = viewModel.diaries
 
+        LaunchedEffect(key1 = state.value) {
+            if (!(state.value == RequestState.Loading || state.value == RequestState.Idle)) {
+                keepSplashScreen(false)
+            }
+        }
+
         HomeScreen(
             drawerState = navDrawerState,
-            state = state,
+            state = state.value,
             onMenuClicked = {
                 scope.launch {
                     navDrawerState.open()

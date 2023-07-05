@@ -1,9 +1,13 @@
 package com.example.yourdiabetesdiary.presentation.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,22 +28,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
 import com.example.yourdiabetesdiary.data.repository.DiariesType
 import com.example.yourdiabetesdiary.domain.RequestState
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    state: State<RequestState<DiariesType>>,
+    state: RequestState<DiariesType>,
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
     navigateToWriteScreen: () -> Unit,
     onSignOut: () -> Unit
 ) {
+    var padding by remember {
+        mutableStateOf(PaddingValues())
+    }
+
     NavigationDrawer(
         drawerState = drawerState,
         onSignOut = {
@@ -50,11 +64,17 @@ fun HomeScreen(
         Scaffold(topBar = {
             HomeTopAppBar(onNavigationMenuClicked = { onMenuClicked() }, onFilterClicked = { })
         }, floatingActionButton = {
-            FloatingActionButton(onClick = { navigateToWriteScreen() }) {
+            FloatingActionButton(
+                modifier = Modifier.padding(
+                    end = padding.calculateEndPadding(
+                        LayoutDirection.Ltr
+                    )
+                ), onClick = { navigateToWriteScreen() }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
             }
         }, content = {
-            when (val currentState = state.value) {
+            padding = it
+            when (val currentState = state) {
                 is RequestState.Error -> {
                     EmptyDataInfo(
                         title = "Error occurred",
@@ -62,7 +82,10 @@ fun HomeScreen(
                     )
                 }
 
-                RequestState.Idle -> TODO()
+                RequestState.Idle -> {
+
+                }
+
                 RequestState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()

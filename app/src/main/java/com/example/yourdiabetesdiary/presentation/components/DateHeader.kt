@@ -2,6 +2,7 @@ package com.example.yourdiabetesdiary.presentation.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,8 +22,14 @@ import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateHeader(localDate: LocalDate) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+fun DateHeader(modifier: Modifier = Modifier, localDate: LocalDate) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.surface)
+            .alpha(0.9f),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = String.format("%02d", localDate.dayOfMonth),
@@ -61,6 +69,7 @@ fun DateHeader(localDate: LocalDate) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PreviewHeader() {
