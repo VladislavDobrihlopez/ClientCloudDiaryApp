@@ -27,7 +27,7 @@ fun DateHeader(modifier: Modifier = Modifier, localDate: LocalDate) {
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface)
-            .alpha(0.9f),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(horizontalAlignment = Alignment.End) {

@@ -9,12 +9,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopAppBar(onNavigationMenuClicked: () -> Unit, onFilterClicked: () -> Unit) {
-    TopAppBar(navigationIcon = {
+fun HomeTopAppBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    onNavigationMenuClicked: () -> Unit,
+    onFilterClicked: () -> Unit
+) {
+    TopAppBar(
+        scrollBehavior = scrollBehavior,
+        navigationIcon = {
         IconButton(onClick = onNavigationMenuClicked) {
             Icon(
                 imageVector = Icons.Default.Menu,

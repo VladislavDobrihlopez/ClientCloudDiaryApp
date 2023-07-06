@@ -34,7 +34,7 @@ fun HomeContent(
         LazyColumn(modifier = modifier.padding(24.dp)) {
             diariesOnSpecificDate.forEach { date, diaries ->
                 stickyHeader(key = date) {
-                    DateHeader(modifier = Modifier.padding(vertical = 12.dp), localDate = date)
+                    DateHeader(localDate = date)
                 }
 
                 items(
