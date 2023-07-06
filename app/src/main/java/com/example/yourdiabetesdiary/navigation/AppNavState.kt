@@ -11,7 +11,7 @@ class AppNavState(private val navController: NavController) {
         navController.navigate(Screen.Home.route)
     }
 
-    fun navigateToWrite(diaryId: String = "") {
+    fun navigateToCompose(diaryId: String = "") {
         if (diaryId.isEmpty()) {
             navController.navigate(Screen.DiaryEntry.route)
         } else {

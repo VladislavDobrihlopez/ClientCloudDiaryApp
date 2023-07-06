@@ -22,6 +22,7 @@ import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
+import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionViewModel
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
@@ -50,8 +51,11 @@ fun SetupNavHost(
         }
         homeRoute(
             keepSplashScreen = keepSplashScreen,
-            navigateToWriteScreen = {
-                navigationState.navigateToWrite()
+            navigateToComposeScreenWithArguments = { chosenDiary ->
+                navigationState.navigateToCompose(diaryId = chosenDiary)
+            },
+            navigateToComposeScreen = {
+                navigationState.navigateToCompose()
             },
             navigateBackToAuthScreen = {
                 navigationState.navigateToAuth()
@@ -112,7 +116,8 @@ private fun NavGraphBuilder.authenticationRoute(
 @RequiresApi(Build.VERSION_CODES.O)
 private fun NavGraphBuilder.homeRoute(
     keepSplashScreen: (Boolean) -> Unit,
-    navigateToWriteScreen: () -> Unit,
+    navigateToComposeScreenWithArguments: (String) -> Unit,
+    navigateToComposeScreen: () -> Unit,
     navigateBackToAuthScreen: () -> Unit
 ) {
     composable(route = Screen.Home.route) {
@@ -140,12 +145,13 @@ private fun NavGraphBuilder.homeRoute(
                     navDrawerState.open()
                 }
             },
-            navigateToWriteScreen = {
-                navigateToWriteScreen()
+            navigateToCompositionScreen = {
+                navigateToComposeScreen()
             },
             onSignOut = {
                 openDialogState.value = true
-            }
+            },
+            onDiaryChose = navigateToComposeScreenWithArguments
         )
 
         CustomAlertDialog(
@@ -180,6 +186,16 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             defaultValue = null
         })
     ) {
+        val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
+
+        val viewModel: CompositionViewModel = viewModel()
+
+        val id = viewModel.uiState.value
+
+        LaunchedEffect(key1 = viewModel.uiState) {
+            Log.d("TEST_VIEWMODEL", "${id}")
+        }
+
         CompositionScreen(navigateBack = navigateBack, diaryEntry = null, onDeleteConfirmed = {})
     }
 }

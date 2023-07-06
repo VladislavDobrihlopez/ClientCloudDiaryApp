@@ -92,7 +92,12 @@ fun CompositionScreen(
             )
         }
     ) { paddings ->
-        CompositionContent(paddings)
+        CompositionContent(
+            paddings,
+            title = "Some title",
+            onTitleChanged = { newTitle -> },
+            description = "Some description",
+            onDescriptionChanged = { newDescription -> })
     }
 }
 
@@ -114,8 +119,8 @@ fun ConfirmationDialog(
     }
 
     CustomAlertDialog(
-        title = "${performedAction}",
-        message = "Are you sure you want to ${performedAction} this diary without the possibility to restore in the future?",
+        title = performedAction.name.lowercase().replaceFirstChar { it.titlecase() },
+        message = "Are you sure you want to ${performedAction.name.lowercase()} this diary without the possibility to restore in the future?",
         isDialogOpened = isDialogOpened,
         onYesClicked = {
             showOff()

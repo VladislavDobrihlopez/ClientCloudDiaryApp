@@ -70,7 +70,7 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
                     MutableInteractionSource()
                 }
             ) {
-                onClick(entry._id.toString())
+                onClick(entry._id.toHexString())
             }
     ) {
         Spacer(modifier = Modifier.width(14.dp))
