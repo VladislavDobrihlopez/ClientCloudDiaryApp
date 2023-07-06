@@ -1,9 +1,14 @@
 package com.example.yourdiabetesdiary.presentation.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -21,22 +27,39 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.presentation.components.DateHeader
-import java.time.LocalDate
+import com.example.yourdiabetesdiary.data.repository.DiariesType
+import com.example.yourdiabetesdiary.domain.RequestState
 
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
+    state: RequestState<DiariesType>,
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
     navigateToWriteScreen: () -> Unit,
     onSignOut: () -> Unit
 ) {
+    var padding by remember {
+        mutableStateOf(PaddingValues())
+    }
+
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
     NavigationDrawer(
         drawerState = drawerState,
         onSignOut = {
@@ -44,15 +67,55 @@ fun HomeScreen(
         },
         onAboutClicked = {}
     ) {
-        Scaffold(topBar = {
-            HomeTopAppBar(onNavigationMenuClicked = { onMenuClicked() }, onFilterClicked = { })
-        }, floatingActionButton = {
-            FloatingActionButton(onClick = { navigateToWriteScreen() }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
-            }
-        }, content = {
-           // DiaryEntryHolder()
-        })
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                HomeTopAppBar(
+                    scrollBehavior = scrollBehavior,
+                    onNavigationMenuClicked = { onMenuClicked() },
+                    onFilterClicked = { })
+            }, floatingActionButton = {
+                FloatingActionButton(
+                    modifier = Modifier.padding(
+                        end = padding.calculateEndPadding(
+                            LayoutDirection.Ltr
+                        )
+                    ), onClick = { navigateToWriteScreen() }) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
+                }
+            }, content = {
+                padding = it
+                when (val currentState = state) {
+                    is RequestState.Error -> {
+                        EmptyDataInfo(
+                            title = "Error occurred",
+                            subtitle = currentState.ex.message.toString()
+                        )
+                    }
+
+                    RequestState.Idle -> {
+
+                    }
+
+                    RequestState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    is RequestState.Success -> {
+                        HomeContent(modifier = Modifier.padding(it),
+                            diariesOnSpecificDate = currentState.data,
+                            onDiaryClick = { chosedDiary ->
+
+                            })
+                    }
+                }
+
+            })
     }
 }
 
