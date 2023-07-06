@@ -23,6 +23,10 @@ class AppNavState(private val navController: NavController) {
         navController.popBackStack()
         navController.navigate(Screen.Authentication.route)
     }
+
+    fun navigateBack() {
+        navController.popBackStack()
+    }
 }
 
 @Composable

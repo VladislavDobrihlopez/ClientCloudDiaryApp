@@ -4,7 +4,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,11 +17,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
+import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
@@ -33,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SetupNavHost(
     navHostController: NavHostController,
@@ -57,7 +57,9 @@ fun SetupNavHost(
                 navigationState.navigateToAuth()
             }
         )
-        diaryRoute()
+        diaryRoute(navigateBack = {
+            navigationState.navigateBack()
+        })
     }
 }
 
@@ -168,7 +170,7 @@ private fun NavGraphBuilder.homeRoute(
     }
 }
 
-private fun NavGraphBuilder.diaryRoute() {
+private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
     composable(
         route = Screen.DiaryEntry.route, arguments = listOf(navArgument(
             name = Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY,
@@ -178,6 +180,6 @@ private fun NavGraphBuilder.diaryRoute() {
             defaultValue = null
         })
     ) {
-
+        CompositionScreen(navigateBack = navigateBack, diaryEntry = null, onDeleteConfirmed = {})
     }
 }
