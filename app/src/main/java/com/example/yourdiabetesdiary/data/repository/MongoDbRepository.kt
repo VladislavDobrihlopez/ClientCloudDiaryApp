@@ -12,5 +12,5 @@ interface MongoDbRepository {
     fun configureRealmDb()
     fun retrieveDiaries(): Flow<RequestState<DiariesType>>
     suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>>
-    suspend fun addNewDiary(diaryEntry: DiaryEntry): RequestState<DiaryEntry>
+    suspend fun upsertEntry(diaryEntry: DiaryEntry): Flow<RequestState<DiaryEntry>>
 }

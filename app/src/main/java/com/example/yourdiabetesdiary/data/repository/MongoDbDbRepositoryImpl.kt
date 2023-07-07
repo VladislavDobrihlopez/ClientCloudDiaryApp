@@ -73,6 +73,8 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
     }
 
     override suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>> {
+        Log.d("TEST_STORING", "pulled: $diaryId")
+
         return if (isSessionValid()) {
             withContext(Dispatchers.IO) {
                 try {
@@ -92,22 +94,59 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
         }
     }
 
-    override suspend fun addNewDiary(diaryEntry: DiaryEntry): RequestState<DiaryEntry> {
+    override suspend fun upsertEntry(diaryEntry: DiaryEntry): Flow<RequestState<DiaryEntry>> {
+        Log.d("TEST_STORING", "navigated in viewmodel upsertEntry: ${diaryEntry._id}")
+
         return if (isSessionValid()) {
             withContext(Dispatchers.IO) {
                 try {
-                    val addedDiary = realm.write {
-                        copyToRealm(diaryEntry.apply {
-                            ownerId = currentUser!!.id
-                        })
+                    try {
+                        val queriedDiary = realm.write {
+                            query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first().find()
+                        }
+                        Log.d(
+                            "TEST_STORING",
+                            "navigated in viewmodel upsertEntry: ${queriedDiary == null}"
+                        )
+                        if (queriedDiary == null) {
+                            realm.write {
+                                copyToRealm(diaryEntry.apply {
+                                    ownerId = currentUser!!.id
+                                })
+                            }
+                            flow {
+                                emit(RequestState.Success<DiaryEntry>(data = diaryEntry))
+                            }
+                        } else {
+                            realm.write {
+                                val queriedEntry = query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first().find()!!
+                                queriedEntry.apply {
+                                    this.title = diaryEntry.title
+                                    this.description = diaryEntry.description
+                                    this.date = diaryEntry.date
+                                    this.images = diaryEntry.images
+                                    this.mood = diaryEntry.mood
+                                }
+                            }
+                            flow {
+                                emit(RequestState.Success<DiaryEntry>(data = diaryEntry))
+                            }
+                        }
+                    } catch (ex: NoSuchElementException) {
+                        flow {
+                            emit(RequestState.Error(ex))
+                        }
                     }
-                    RequestState.Success<DiaryEntry>(data = addedDiary)
                 } catch (e: Exception) {
-                    RequestState.Error(e)
+                    flow {
+                        emit(RequestState.Error(e))
+                    }
                 }
             }
         } else {
-            RequestState.Error(CustomException.UserNotAuthenticatedException())
+            flow {
+                emit(RequestState.Error(CustomException.UserNotAuthenticatedException()))
+            }
         }
     }
 

@@ -34,6 +34,8 @@ class CompositionViewModel(
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
 
+                Log.d("TEST_STORING", "navigated in viewmodel: $id")
+
                 MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
                     .collect { requestResult ->
                         if (requestResult is RequestState.Success) {
@@ -53,18 +55,21 @@ class CompositionViewModel(
 
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = MongoDbDbRepositoryImpl.addNewDiary(diary)) {
-                is RequestState.Success -> {
-                    withContext(Dispatchers.Main) {
-                        onSuccess()
+            MongoDbDbRepositoryImpl.upsertEntry(diary).collect { result ->
+                Log.d("TEST_STORING", "$result")
+                when (result) {
+                    is RequestState.Success -> {
+                        withContext(Dispatchers.Main) {
+                            onSuccess()
+                        }
                     }
-                }
 
-                is RequestState.Error -> withContext(Dispatchers.Main) {
-                    onFailure(result.ex.message.toString())
-                }
+                    is RequestState.Error -> withContext(Dispatchers.Main) {
+                        onFailure(result.ex.message.toString())
+                    }
 
-                else -> onFailure("Unexpected problem occurred")
+                    else -> onFailure("Unexpected problem occurred")
+                }
             }
         }
     }

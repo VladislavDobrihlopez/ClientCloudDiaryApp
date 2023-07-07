@@ -112,9 +112,7 @@ fun CompositionScreen(
             description = screenState.description,
             onDescriptionChanged = { newDescription -> onDescriptionChanged(newDescription) },
             onSaveDiaryButtonClicked = { diary ->
-                onSaveDiaryButtonClicked(diary.apply {
-                    this.mood = mood()
-                })
+                onSaveDiaryButtonClicked(diary)
             }
         )
     }

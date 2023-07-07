@@ -36,6 +36,7 @@ import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -56,6 +57,7 @@ fun SetupNavHost(
         homeRoute(
             keepSplashScreen = keepSplashScreen,
             navigateToComposeScreenWithArguments = { chosenDiary ->
+                Log.d("TEST_STORING", "navigated id: $chosenDiary")
                 navigationState.navigateToCompose(diaryId = chosenDiary)
             },
             navigateToComposeScreen = {
@@ -225,8 +227,16 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             },
             onSaveDiaryButtonClicked = { diary ->
                 viewModel.storeDiary(
-                    diary = diary,
+                    diary = diary.apply {
+                        this.mood = Mood.values()[currentPage.value].name
+                        this._id =
+                            if (entry.selectedDiaryEntryId != null)
+                                ObjectId(entry.selectedDiaryEntryId)
+                            else
+                                ObjectId.invoke()
+                    },
                     onSuccess = {
+                        Log.d("TEST_STORING", "navigationing back")
                         navigateBack()
                     },
                     onFailure = {
