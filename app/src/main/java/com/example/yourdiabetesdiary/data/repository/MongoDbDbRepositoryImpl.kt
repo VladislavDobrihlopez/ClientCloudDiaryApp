@@ -72,19 +72,23 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
         }
     }
 
-    override suspend fun pullDiary(diaryId: ObjectId): RequestState<DiaryEntry> {
+    override suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>> {
         return if (isSessionValid()) {
             withContext(Dispatchers.IO) {
                 try {
-                    val diaryEntry =
-                        realm.query<DiaryEntry>("_id == $0", diaryId).find().first()
-                    RequestState.Success<DiaryEntry>(data = diaryEntry)
+                    realm.query<DiaryEntry>("_id == $0", diaryId).find().asFlow().map {
+                        RequestState.Success<DiaryEntry>(data = it.list.first())
+                    }
                 } catch (e: Exception) {
-                    RequestState.Error(e)
+                    flow {
+                        RequestState.Error(e)
+                    }
                 }
             }
         } else {
-            RequestState.Error(CustomException.UserNotAuthenticatedException())
+            flow {
+                RequestState.Error(CustomException.UserNotAuthenticatedException())
+            }
         }
     }
 

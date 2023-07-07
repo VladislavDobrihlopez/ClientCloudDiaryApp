@@ -34,20 +34,19 @@ class CompositionViewModel(
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
 
-                val requestResult =
-                    MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
+                MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
+                    .collect { requestResult ->
+                        if (requestResult is RequestState.Success) {
+                            Log.d("TEST_DIARY", "mood: ${requestResult.data.mood}")
 
-
-                if (requestResult is RequestState.Success) {
-                    Log.d("TEST_DIARY", "mood: ${requestResult.data.mood}")
-
-                    with(requestResult.data) {
-                        setNewDate(date = date.toInstant())
-                        setNewTitle(title = title)
-                        setNewDescription(description = description)
-                        setNewMood(mood = mood)
+                            with(requestResult.data) {
+                                setNewDate(date = date.toInstant())
+                                setNewTitle(title = title)
+                                setNewDescription(description = description)
+                                setNewMood(mood = mood)
+                            }
+                        }
                     }
-                }
             }
         }
     }

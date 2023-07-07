@@ -11,6 +11,6 @@ typealias DiariesType = Map<LocalDate, List<DiaryEntry>>
 interface MongoDbRepository {
     fun configureRealmDb()
     fun retrieveDiaries(): Flow<RequestState<DiariesType>>
-    suspend fun pullDiary(diaryId: ObjectId): RequestState<DiaryEntry>
+    suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>>
     suspend fun addNewDiary(diaryEntry: DiaryEntry): RequestState<DiaryEntry>
 }
