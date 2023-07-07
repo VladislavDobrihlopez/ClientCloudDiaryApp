@@ -7,6 +7,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
@@ -26,6 +28,8 @@ import com.example.yourdiabetesdiary.presentation.screens.composition.Compositio
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.stevdzasan.messagebar.rememberMessageBarState
 import com.stevdzasan.onetap.rememberOneTapSignInState
 import io.realm.kotlin.mongodb.App
@@ -176,6 +180,7 @@ private fun NavGraphBuilder.homeRoute(
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
     composable(
         route = Screen.DiaryEntry.route, arguments = listOf(navArgument(
@@ -186,16 +191,38 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             defaultValue = null
         })
     ) {
-        val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
+        //val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
 
         val viewModel: CompositionViewModel = viewModel()
+        val screenState = viewModel.uiState.value
 
-        val id = viewModel.uiState.value
+        val pagerState = rememberPagerState()
 
-        LaunchedEffect(key1 = viewModel.uiState) {
-            Log.d("TEST_VIEWMODEL", "${id}")
+        val entry = viewModel.uiState.value
+
+
+        LaunchedEffect(key1 = entry.mood) {
+            pagerState.animateScrollToPage(Mood.valueOf(entry.mood.name).ordinal)
         }
 
-        CompositionScreen(navigateBack = navigateBack, diaryEntry = null, onDeleteConfirmed = {})
+        val currentPage = remember {
+            derivedStateOf { pagerState.currentPage }
+        }
+
+        CompositionScreen(
+            date = entry?.date,
+            mood = { Mood.values()[currentPage.value].name },
+            pagerState = pagerState,
+            screenState = screenState,
+            navigateBack = navigateBack,
+            onDescriptionChanged = { desc ->
+                viewModel.setNewDescription(desc)
+            },
+            onTitleChanged = { title ->
+                viewModel.setNewTitle(title)
+            },
+            onDeleteConfirmed = {
+
+            })
     }
 }

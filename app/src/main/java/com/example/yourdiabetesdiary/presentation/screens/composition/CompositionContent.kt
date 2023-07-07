@@ -34,7 +34,7 @@ import coil.request.ImageRequest
 import com.example.yourdiabetesdiary.models.Mood
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerState
 
 @OptIn(
     ExperimentalPagerApi::class, ExperimentalFoundationApi::class,
@@ -42,11 +42,12 @@ import com.google.accompanist.pager.rememberPagerState
 )
 @Composable
 fun CompositionContent(
+    pagerState: PagerState,
     paddingValues: PaddingValues,
     title: String,
     onTitleChanged: (String) -> Unit,
     description: String,
-    onDescriptionChanged: (String) -> Unit
+    onDescriptionChanged: (String) -> Unit,
 ) {
     val verticalScrollState = rememberScrollState()
 
@@ -68,11 +69,10 @@ fun CompositionContent(
         ) {
             val bunchOfMoods = rememberSaveable {
                 val moods = Mood.values()
-                moods.shuffle()
+                //moods.shuffle()
                 mutableStateOf(moods)
             }
 
-            val pagerState = rememberPagerState()
             HorizontalPager(state = pagerState, count = Mood.values().size) { page ->
                 bunchOfMoods.value[page].also { mood ->
                     AsyncImage(
@@ -108,7 +108,7 @@ fun CompositionContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 value = description,
                 onValueChange = onDescriptionChanged,
                 placeholder = { Text(text = "Description") },
@@ -123,14 +123,12 @@ fun CompositionContent(
                 keyboardActions = KeyboardActions(onNext = {
 
                 }),
-                maxLines = 1,
-                singleLine = true
             )
         }
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom) {
             Spacer(modifier = Modifier.height(12.dp))
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(54.dp),
                 onClick = { },
                 shape = Shapes().small
             ) {

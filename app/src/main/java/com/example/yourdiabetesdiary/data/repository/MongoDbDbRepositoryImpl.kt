@@ -12,9 +12,12 @@ import io.realm.kotlin.log.LogLevel
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import io.realm.kotlin.query.Sort
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
 
 object MongoDbDbRepositoryImpl : MongoDbRepository {
@@ -27,9 +30,9 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
     }
 
     override fun configureRealmDb() {
-        if (currentUser != null) {
+        if (isSessionValid()) {
             val config =
-                SyncConfiguration.Builder(user = currentUser, schema = setOf(DiaryEntry::class))
+                SyncConfiguration.Builder(user = currentUser!!, schema = setOf(DiaryEntry::class))
                     .initialSubscriptions { subscription ->
                         add(
                             query = subscription.query<DiaryEntry>("ownerId == $0", currentUser.id),
@@ -43,14 +46,14 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
     }
 
     override fun retrieveDiaries(): Flow<RequestState<DiariesType>> {
-        return if (currentUser != null) {
+        return if (isSessionValid()) {
             try {
-                realm.query<DiaryEntry>(query = "ownerId == $0", currentUser.id)
+                realm.query<DiaryEntry>(query = "ownerId == $0", currentUser!!.id)
                     .sort(property = "date", sortOrder = Sort.DESCENDING)
                     .asFlow()
                     .map { result ->
                         Log.d("TEST_DIARY", "${result.list}")
-                        Log.d("TEST_DIARY", "${currentUser.id}")
+                        Log.d("TEST_DIARY", "${currentUser!!.id}")
                         RequestState.Success(data = result.list.groupBy { diaryEntry ->
                             diaryEntry.date.toInstant()
                                 .atZone(ZoneId.systemDefault())
@@ -68,4 +71,22 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
             }
         }
     }
+
+    override suspend fun pullDiary(diaryId: ObjectId): RequestState<DiaryEntry> {
+        return if (isSessionValid()) {
+            withContext(Dispatchers.IO) {
+                try {
+                    val diaryEntry =
+                        realm.query<DiaryEntry>("_id == $0", diaryId).find().first()
+                    RequestState.Success<DiaryEntry>(data = diaryEntry)
+                } catch (e: Exception) {
+                    RequestState.Error(e)
+                }
+            }
+        } else {
+            RequestState.Error(CustomException.UserNotAuthenticatedException())
+        }
+    }
+
+    private fun isSessionValid() = currentUser != null
 }

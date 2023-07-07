@@ -17,19 +17,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import java.time.Instant
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CompositionScreen(
-    diaryEntry: DiaryEntry?,
+    mood: () -> String,
+    pagerState: PagerState,
+    screenState: CompositionScreenState,
+    date: Instant?,
     navigateBack: () -> Unit,
-    onDeleteConfirmed: () -> Unit
+    onDeleteConfirmed: () -> Unit,
+    onTitleChanged: (String) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
         topBar = {
             CompositionTopBar(
+                instant = date,
+                mood = mood,
                 onNavigateBackClicked = {
                     navigateBack()
                 },
@@ -93,11 +103,13 @@ fun CompositionScreen(
         }
     ) { paddings ->
         CompositionContent(
-            paddings,
-            title = "Some title",
-            onTitleChanged = { newTitle -> },
-            description = "Some description",
-            onDescriptionChanged = { newDescription -> })
+            pagerState = pagerState,
+            paddingValues = paddings,
+            title = screenState.title,
+            onTitleChanged = { newTitle -> onTitleChanged(newTitle) },
+            description = screenState.description,
+            onDescriptionChanged = { newDescription -> onDescriptionChanged(newDescription) },
+        )
     }
 }
 
