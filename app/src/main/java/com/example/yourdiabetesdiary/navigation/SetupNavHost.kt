@@ -200,7 +200,6 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
 
         val entry = viewModel.uiState.value
 
-
         LaunchedEffect(key1 = entry.mood) {
             pagerState.animateScrollToPage(Mood.valueOf(entry.mood.name).ordinal)
         }
@@ -210,7 +209,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
         }
 
         CompositionScreen(
-            date = entry?.date,
+            date = entry.date,
             mood = { Mood.values()[currentPage.value].name },
             pagerState = pagerState,
             screenState = screenState,
@@ -223,6 +222,18 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             },
             onDeleteConfirmed = {
 
-            })
+            },
+            onSaveDiaryButtonClicked = { diary ->
+                viewModel.storeDiary(
+                    diary = diary,
+                    onSuccess = {
+                        navigateBack()
+                    },
+                    onFailure = {
+                        navigateBack()
+                    }
+                )
+            }
+        )
     }
 }

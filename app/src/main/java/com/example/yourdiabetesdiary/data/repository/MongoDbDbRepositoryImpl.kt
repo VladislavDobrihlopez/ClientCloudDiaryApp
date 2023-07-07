@@ -88,5 +88,24 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
         }
     }
 
+    override suspend fun addNewDiary(diaryEntry: DiaryEntry): RequestState<DiaryEntry> {
+        return if (isSessionValid()) {
+            withContext(Dispatchers.IO) {
+                try {
+                    val addedDiary = realm.write {
+                        copyToRealm(diaryEntry.apply {
+                            ownerId = currentUser!!.id
+                        })
+                    }
+                    RequestState.Success<DiaryEntry>(data = addedDiary)
+                } catch (e: Exception) {
+                    RequestState.Error(e)
+                }
+            }
+        } else {
+            RequestState.Error(CustomException.UserNotAuthenticatedException())
+        }
+    }
+
     private fun isSessionValid() = currentUser != null
 }

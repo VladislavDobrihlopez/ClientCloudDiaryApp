@@ -1,6 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,13 +31,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.Mood
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 
 @OptIn(
-    ExperimentalPagerApi::class, ExperimentalFoundationApi::class,
+    ExperimentalPagerApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
@@ -45,11 +46,13 @@ fun CompositionContent(
     pagerState: PagerState,
     paddingValues: PaddingValues,
     title: String,
-    onTitleChanged: (String) -> Unit,
     description: String,
+    onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -128,8 +131,23 @@ fun CompositionContent(
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom) {
             Spacer(modifier = Modifier.height(12.dp))
             Button(
-                modifier = Modifier.fillMaxWidth().height(54.dp),
-                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                onClick = {
+                    if (title.isNotEmpty() && description.isNotEmpty()) {
+                        onSaveDiaryButtonClicked(DiaryEntry().apply {
+                            this.title = title.trim()
+                            this.description = description.trim()
+                        })
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Either title or description shouldn't be empty",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
                 shape = Shapes().small
             ) {
                 Text(text = "Save")

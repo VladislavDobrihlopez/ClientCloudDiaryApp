@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -33,6 +34,7 @@ fun CompositionScreen(
     onDeleteConfirmed: () -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
@@ -109,6 +111,11 @@ fun CompositionScreen(
             onTitleChanged = { newTitle -> onTitleChanged(newTitle) },
             description = screenState.description,
             onDescriptionChanged = { newDescription -> onDescriptionChanged(newDescription) },
+            onSaveDiaryButtonClicked = { diary ->
+                onSaveDiaryButtonClicked(diary.apply {
+                    this.mood = mood()
+                })
+            }
         )
     }
 }

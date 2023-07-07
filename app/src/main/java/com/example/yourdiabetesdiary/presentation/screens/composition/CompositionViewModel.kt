@@ -8,10 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.util.toInstant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 
 class CompositionViewModel(
@@ -27,7 +30,6 @@ class CompositionViewModel(
     }
 
     fun getDiaryInfo() {
-
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
@@ -46,6 +48,24 @@ class CompositionViewModel(
                         setNewMood(mood = mood)
                     }
                 }
+            }
+        }
+    }
+
+    fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = MongoDbDbRepositoryImpl.addNewDiary(diary)) {
+                is RequestState.Success -> {
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
+                    }
+                }
+
+                is RequestState.Error -> withContext(Dispatchers.Main) {
+                    onFailure(result.ex.message.toString())
+                }
+
+                else -> onFailure("Unexpected problem occurred")
             }
         }
     }
