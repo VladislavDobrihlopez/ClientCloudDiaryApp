@@ -12,6 +12,7 @@ import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.util.toInstant
+import com.example.yourdiabetesdiary.util.toRealmInstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,8 +35,6 @@ class CompositionViewModel(
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
 
-                Log.d("TEST_STORING", "navigated in viewmodel: $id")
-
                 MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
                     .collect { requestResult ->
                         if (requestResult is RequestState.Success) {
@@ -55,7 +54,11 @@ class CompositionViewModel(
 
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            MongoDbDbRepositoryImpl.upsertEntry(diary).collect { result ->
+            MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
+                _uiState.value.date?.let { openingScreenTime ->
+                    this.date = openingScreenTime.toRealmInstant()
+                }
+            }).collect { result ->
                 Log.d("TEST_STORING", "$result")
                 when (result) {
                     is RequestState.Success -> {
