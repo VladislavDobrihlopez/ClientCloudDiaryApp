@@ -22,6 +22,7 @@ import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import java.time.Instant
+import java.time.ZonedDateTime
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -34,7 +35,8 @@ fun CompositionScreen(
     onDeleteConfirmed: () -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
-    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
+    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit,
+    onDateUpdated: (ZonedDateTime) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
@@ -45,13 +47,11 @@ fun CompositionScreen(
                 onNavigateBackClicked = {
                     navigateBack()
                 },
-                onDateRangeClicked = {
-
-                },
+                onDateUpdated = onDateUpdated,
                 availableActions = {
-//                    if (diaryEntry == null) {
-//                        return@CompositionTopBar
-//                    }
+                    if (date == null) {
+                        return@CompositionTopBar
+                    }
 
                     val isDialogOpened = remember {
                         mutableStateOf(false)
@@ -116,6 +116,11 @@ fun CompositionScreen(
             }
         )
     }
+}
+
+@Composable
+fun TimeChoosingDialog() {
+
 }
 
 @Composable

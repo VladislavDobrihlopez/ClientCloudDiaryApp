@@ -196,11 +196,12 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
         //val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
 
         val viewModel: CompositionViewModel = viewModel()
-        val screenState = viewModel.uiState.value
 
         val pagerState = rememberPagerState()
 
         val entry = viewModel.uiState.value
+
+        Log.d("NEW_STATE", "${entry.date}, ${entry.mood}")
 
         LaunchedEffect(key1 = entry.mood) {
             pagerState.animateScrollToPage(Mood.valueOf(entry.mood.name).ordinal)
@@ -214,7 +215,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             date = entry.date,
             mood = { Mood.values()[currentPage.value].name },
             pagerState = pagerState,
-            screenState = screenState,
+            screenState = entry,
             navigateBack = navigateBack,
             onDescriptionChanged = { desc ->
                 viewModel.setNewDescription(desc)
@@ -243,6 +244,10 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                         navigateBack()
                     }
                 )
+            },
+            onDateUpdated = { zonedDateTime ->
+                Log.d("ON_DATE_UPDATED", zonedDateTime.toString())
+                viewModel.setNewDateAndTime(zonedDateTime = zonedDateTime)
             }
         )
     }

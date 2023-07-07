@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.time.ZonedDateTime
 
 class CompositionViewModel(
     private val savedStateHandle: SavedStateHandle
@@ -55,8 +56,8 @@ class CompositionViewModel(
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
-                _uiState.value.date?.let { openingScreenTime ->
-                    this.date = openingScreenTime.toRealmInstant()
+                _uiState.value.date?.let { updatedOrScreenOpeningTime ->
+                    this.date = updatedOrScreenOpeningTime.toRealmInstant()
                 }
             }).collect { result ->
                 Log.d("TEST_STORING", "$result")
@@ -91,6 +92,10 @@ class CompositionViewModel(
 
     fun setNewDate(date: Instant) {
         _uiState.value = _uiState.value.copy(date = date)
+    }
+
+    fun setNewDateAndTime(zonedDateTime: ZonedDateTime) {
+        _uiState.value = _uiState.value.copy(date = zonedDateTime.toInstant())
     }
 
     private fun putRoutedDiaryIdArgument() {
