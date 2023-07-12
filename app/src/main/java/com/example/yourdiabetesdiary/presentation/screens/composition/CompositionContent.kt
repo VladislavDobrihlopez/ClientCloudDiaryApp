@@ -1,5 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -26,11 +27,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -57,6 +64,17 @@ fun CompositionContent(
 ) {
     val verticalScrollState = rememberScrollState()
     val context = LocalContext.current
+
+    val isDescriptionFocused = remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = verticalScrollState.maxValue, key2 = isDescriptionFocused.value) {
+        Log.d("SCROLL_STATE", "${verticalScrollState.value}")
+        if (isDescriptionFocused.value) {
+            verticalScrollState.animateScrollTo(verticalScrollState.maxValue)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -94,6 +112,9 @@ fun CompositionContent(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            val focusManager = LocalFocusManager.current
+
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = title,
@@ -108,14 +129,18 @@ fun CompositionContent(
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = {
-
+                    focusManager.moveFocus(FocusDirection.Next)
                 }),
                 maxLines = 1,
                 singleLine = true
             )
             Spacer(modifier = Modifier.height(12.dp))
+
+
             TextField(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().onFocusChanged { focusState ->
+                    isDescriptionFocused.value = focusState.hasFocus
+                },
                 value = description,
                 onValueChange = onDescriptionChanged,
                 placeholder = { Text(text = "Description") },
@@ -128,7 +153,7 @@ fun CompositionContent(
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onNext = {
-
+                    focusManager.clearFocus()
                 }),
             )
         }
