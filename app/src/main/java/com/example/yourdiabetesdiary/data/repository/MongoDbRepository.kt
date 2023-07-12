@@ -13,4 +13,5 @@ interface MongoDbRepository {
     fun retrieveDiaries(): Flow<RequestState<DiariesType>>
     suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>>
     suspend fun upsertEntry(diaryEntry: DiaryEntry): Flow<RequestState<DiaryEntry>>
+    suspend fun deleteDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>>
 }

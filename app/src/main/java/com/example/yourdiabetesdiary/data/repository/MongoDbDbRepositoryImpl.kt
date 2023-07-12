@@ -119,7 +119,9 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
                             }
                         } else {
                             realm.write {
-                                val queriedEntry = query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first().find()!!
+                                val queriedEntry =
+                                    query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first()
+                                        .find()!!
                                 queriedEntry.apply {
                                     this.title = diaryEntry.title
                                     this.description = diaryEntry.description
@@ -146,6 +148,43 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
         } else {
             flow {
                 emit(RequestState.Error(CustomException.UserNotAuthenticatedException()))
+            }
+        }
+    }
+
+    override suspend fun deleteDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>> {
+        return if (isSessionValid()) {
+            withContext(Dispatchers.IO) {
+                realm.write {
+                    try {
+                        val diary = query<DiaryEntry>(
+                            "_id == $0 AND ownerId == $1",
+                            diaryId,
+                            currentUser!!.id
+                        ).first().find()
+
+                        Log.d("TEST_DELETING", "$diary")
+
+                        if (diary != null) {
+                            delete(diary)
+                            flow {
+                                emit(RequestState.Success(diary))
+                            }
+                        } else {
+                            flow {
+                                emit(RequestState.Error(IllegalStateException("Diary doesn't exist")))
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        flow {
+                            emit(RequestState.Error(ex = ex))
+                        }
+                    }
+                }
+            }
+        } else {
+            flow {
+                emit(RequestState.Error(ex = CustomException.UserNotAuthenticatedException()))
             }
         }
     }

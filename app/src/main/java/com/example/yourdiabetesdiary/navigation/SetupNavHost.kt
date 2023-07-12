@@ -2,6 +2,7 @@ package com.example.yourdiabetesdiary.navigation
 
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
@@ -11,6 +12,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -195,10 +197,9 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
     ) {
         //val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
 
+        val context = LocalContext.current
         val viewModel: CompositionViewModel = viewModel()
-
         val pagerState = rememberPagerState()
-
         val entry = viewModel.uiState.value
 
         Log.d("NEW_STATE", "${entry.date}, ${entry.mood}")
@@ -224,7 +225,12 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                 viewModel.setNewTitle(title)
             },
             onDeleteConfirmed = {
-
+                viewModel.deleteDiary(onSuccess = {
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                    navigateBack()
+                }, onFailure = { error ->
+                    Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT).show()
+                })
             },
             onSaveDiaryButtonClicked = { diary ->
                 viewModel.storeDiary(
@@ -240,7 +246,8 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                         Log.d("TEST_STORING", "navigationing back")
                         navigateBack()
                     },
-                    onFailure = {
+                    onFailure = { error ->
+                        Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT).show()
                         navigateBack()
                     }
                 )

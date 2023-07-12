@@ -14,8 +14,10 @@ import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -35,8 +37,10 @@ class CompositionViewModel(
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
-
                 MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
+                    .catch { ex ->
+                        emit(RequestState.Error(IllegalStateException("Diary already deleted")))
+                    }
                     .collect { requestResult ->
                         if (requestResult is RequestState.Success) {
                             Log.d("TEST_DIARY", "mood: ${requestResult.data.mood}")
@@ -75,6 +79,28 @@ class CompositionViewModel(
                     else -> onFailure("Unexpected problem occurred")
                 }
             }
+        }
+    }
+
+    fun deleteDiary(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            MongoDbDbRepositoryImpl.deleteDiary(diaryId = ObjectId(uiState.value.selectedDiaryEntryId!!))
+                .collect { result ->
+                    Log.d("TEST_DELETING", "$result")
+                    when (result) {
+                        is RequestState.Success ->
+                            withContext(Dispatchers.Main) {
+                                onSuccess()
+                            }
+
+                        is RequestState.Error ->
+                            withContext(Dispatchers.Main) {
+                                onFailure(result.ex.message.toString())
+                            }
+
+                        else -> onFailure("Unexpected problem occurred")
+                    }
+                }
         }
     }
 
