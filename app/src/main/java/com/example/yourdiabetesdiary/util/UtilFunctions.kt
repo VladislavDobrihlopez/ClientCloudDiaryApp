@@ -13,6 +13,7 @@ fun RealmInstant.toInstant(): Instant {
     }
 }
 
+//official documentation function
 fun Instant.toRealmInstant(): RealmInstant {
     val sec: Long = this.epochSecond
     val nano: Int = this.nano

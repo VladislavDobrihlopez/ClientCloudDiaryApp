@@ -29,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,8 +50,9 @@ fun HomeScreen(
     state: RequestState<DiariesType>,
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
-    navigateToWriteScreen: () -> Unit,
-    onSignOut: () -> Unit
+    navigateToCompositionScreen: () -> Unit,
+    onSignOut: () -> Unit,
+    onDiaryChose: (String) -> Unit
 ) {
     var padding by remember {
         mutableStateOf(PaddingValues())
@@ -80,7 +80,7 @@ fun HomeScreen(
                         end = padding.calculateEndPadding(
                             LayoutDirection.Ltr
                         )
-                    ), onClick = { navigateToWriteScreen() }) {
+                    ), onClick = { navigateToCompositionScreen() }) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add a note")
                 }
             }, content = {
@@ -107,15 +107,15 @@ fun HomeScreen(
                     }
 
                     is RequestState.Success -> {
-                        HomeContent(modifier = Modifier.padding(it),
+                        HomeContent(
+                            modifier = Modifier.padding(it),
                             diariesOnSpecificDate = currentState.data,
-                            onDiaryClick = { chosedDiary ->
-
-                            })
+                            onDiaryClick = onDiaryChose
+                        )
                     }
                 }
-
-            })
+            }
+        )
     }
 }
 

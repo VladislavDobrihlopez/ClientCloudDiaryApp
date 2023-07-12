@@ -2,15 +2,17 @@ package com.example.yourdiabetesdiary.navigation
 
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -18,21 +20,27 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
+import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
+import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionViewModel
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.stevdzasan.messagebar.rememberMessageBarState
 import com.stevdzasan.onetap.rememberOneTapSignInState
 import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SetupNavHost(
     navHostController: NavHostController,
@@ -50,14 +58,20 @@ fun SetupNavHost(
         }
         homeRoute(
             keepSplashScreen = keepSplashScreen,
-            navigateToWriteScreen = {
-                navigationState.navigateToWrite()
+            navigateToComposeScreenWithArguments = { chosenDiary ->
+                Log.d("TEST_STORING", "navigated id: $chosenDiary")
+                navigationState.navigateToCompose(diaryId = chosenDiary)
+            },
+            navigateToComposeScreen = {
+                navigationState.navigateToCompose()
             },
             navigateBackToAuthScreen = {
                 navigationState.navigateToAuth()
             }
         )
-        diaryRoute()
+        diaryRoute(navigateBack = {
+            navigationState.navigateBack()
+        })
     }
 }
 
@@ -110,7 +124,8 @@ private fun NavGraphBuilder.authenticationRoute(
 @RequiresApi(Build.VERSION_CODES.O)
 private fun NavGraphBuilder.homeRoute(
     keepSplashScreen: (Boolean) -> Unit,
-    navigateToWriteScreen: () -> Unit,
+    navigateToComposeScreenWithArguments: (String) -> Unit,
+    navigateToComposeScreen: () -> Unit,
     navigateBackToAuthScreen: () -> Unit
 ) {
     composable(route = Screen.Home.route) {
@@ -138,12 +153,13 @@ private fun NavGraphBuilder.homeRoute(
                     navDrawerState.open()
                 }
             },
-            navigateToWriteScreen = {
-                navigateToWriteScreen()
+            navigateToCompositionScreen = {
+                navigateToComposeScreen()
             },
             onSignOut = {
                 openDialogState.value = true
-            }
+            },
+            onDiaryChose = navigateToComposeScreenWithArguments
         )
 
         CustomAlertDialog(
@@ -168,7 +184,8 @@ private fun NavGraphBuilder.homeRoute(
     }
 }
 
-private fun NavGraphBuilder.diaryRoute() {
+@OptIn(ExperimentalPagerApi::class)
+private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
     composable(
         route = Screen.DiaryEntry.route, arguments = listOf(navArgument(
             name = Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY,
@@ -178,6 +195,67 @@ private fun NavGraphBuilder.diaryRoute() {
             defaultValue = null
         })
     ) {
+        //val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
 
+        val context = LocalContext.current
+        val viewModel: CompositionViewModel = viewModel()
+        val pagerState = rememberPagerState()
+        val entry = viewModel.uiState.value
+
+        Log.d("NEW_STATE", "${entry.date}, ${entry.mood}")
+
+        LaunchedEffect(key1 = entry.mood) {
+            pagerState.animateScrollToPage(Mood.valueOf(entry.mood.name).ordinal)
+        }
+
+        val currentPage = remember {
+            derivedStateOf { pagerState.currentPage }
+        }
+
+        CompositionScreen(
+            date = entry.date,
+            mood = { Mood.values()[currentPage.value].name },
+            pagerState = pagerState,
+            screenState = entry,
+            navigateBack = navigateBack,
+            onDescriptionChanged = { desc ->
+                viewModel.setNewDescription(desc)
+            },
+            onTitleChanged = { title ->
+                viewModel.setNewTitle(title)
+            },
+            onDeleteConfirmed = {
+                viewModel.deleteDiary(onSuccess = {
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                    navigateBack()
+                }, onFailure = { error ->
+                    Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT).show()
+                })
+            },
+            onSaveDiaryButtonClicked = { diary ->
+                viewModel.storeDiary(
+                    diary = diary.apply {
+                        this.mood = Mood.values()[currentPage.value].name
+                        this._id =
+                            if (entry.selectedDiaryEntryId != null)
+                                ObjectId(entry.selectedDiaryEntryId)
+                            else
+                                ObjectId.invoke()
+                    },
+                    onSuccess = {
+                        Log.d("TEST_STORING", "navigationing back")
+                        navigateBack()
+                    },
+                    onFailure = { error ->
+                        Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT).show()
+                        navigateBack()
+                    }
+                )
+            },
+            onDateUpdated = { zonedDateTime ->
+                Log.d("ON_DATE_UPDATED", zonedDateTime.toString())
+                viewModel.setNewDateAndTime(zonedDateTime = zonedDateTime)
+            }
+        )
     }
 }
