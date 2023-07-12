@@ -1,6 +1,8 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
 import android.widget.Toast
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -57,12 +61,12 @@ fun CompositionContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding()
-            )
-            .padding(horizontal = 24.dp)
-            .padding(bottom = 24.dp)
+            .imePadding()
+            .navigationBarsPadding()
+            .padding(top = paddingValues.calculateTopPadding())
+            .padding(horizontal = 12.dp)
+            .padding(bottom = 12.dp)
+            .scrollable(rememberScrollState(), orientation = Orientation.Vertical)
     ) {
         Spacer(modifier = Modifier.height(12.dp))
         Column(
