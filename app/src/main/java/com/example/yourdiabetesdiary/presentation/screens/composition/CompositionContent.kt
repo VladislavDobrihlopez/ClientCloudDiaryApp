@@ -74,6 +74,8 @@ fun CompositionContent(
         mutableStateOf(false)
     }
 
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(key1 = verticalScrollState.maxValue, key2 = isDescriptionFocused.value) {
         Log.d("SCROLL_STATE", "${verticalScrollState.value}")
         if (isDescriptionFocused.value) {
@@ -117,8 +119,6 @@ fun CompositionContent(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            val focusManager = LocalFocusManager.current
 
             TextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -168,7 +168,7 @@ fun CompositionContent(
             Spacer(modifier = Modifier.height(12.dp))
             GalleryUploader(
                 onImageAdd = {
-
+                    focusManager.clearFocus()
                 }, onImageSelected = { uri ->
                     onImageSelected(uri)
                 }, onImageClicked = { galleryItem ->

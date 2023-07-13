@@ -13,12 +13,15 @@ import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.navigation.SetupNavHost
 import com.example.yourdiabetesdiary.ui.theme.YourDiabetesDiaryTheme
 import com.example.yourdiabetesdiary.util.Constants
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import io.realm.kotlin.mongodb.App
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Firebase.initialize(this)
 
         var keepDisplayingSplash = true
 
@@ -27,7 +30,6 @@ class MainActivity : ComponentActivity() {
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         setContent {
             YourDiabetesDiaryTheme(dynamicColor = false) {
                 val navController = rememberNavController()

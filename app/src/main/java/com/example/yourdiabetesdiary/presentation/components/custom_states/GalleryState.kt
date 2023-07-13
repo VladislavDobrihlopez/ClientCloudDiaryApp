@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.yourdiabetesdiary.models.GalleryItem
+import kotlin.random.Random
 
 class GalleryState {
     private val _images = mutableListOf<GalleryItem>()
