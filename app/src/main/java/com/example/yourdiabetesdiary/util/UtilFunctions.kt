@@ -1,5 +1,7 @@
 package com.example.yourdiabetesdiary.util
 
+import android.content.Context
+import android.net.Uri
 import io.realm.kotlin.types.RealmInstant
 import java.time.Instant
 
@@ -22,4 +24,8 @@ fun Instant.toRealmInstant(): RealmInstant {
     } else {
         RealmInstant.from(sec + 1, -1_000_000 + nano)
     }
+}
+
+fun Context.getImageType(uri: Uri): String {
+    return contentResolver.getType(uri)?.split("/")?.last() ?: "jpg"
 }

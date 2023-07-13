@@ -4,20 +4,20 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.example.yourdiabetesdiary.util.Constants
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.stevdzasan.messagebar.ContentWithMessageBar
 import com.stevdzasan.messagebar.MessageBarState
 import com.stevdzasan.onetap.OneTapSignInState
 import com.stevdzasan.onetap.OneTapSignInWithGoogle
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(
     authenticated: Boolean,
@@ -26,7 +26,8 @@ fun AuthenticationScreen(
     loadingState: Boolean,
     onScreenIsReady: () -> Unit,
     onButtonClick: () -> Unit,
-    onTokenReceived: (String) -> Unit,
+    onSuccessfulFirebaseSignIn: (String) -> Unit, // token
+    onFailedSignIn: (Exception) -> Unit,
     onReceivingDismissed: (String) -> Unit,
     navigateToHome: () -> Unit
 ) {
@@ -53,7 +54,15 @@ fun AuthenticationScreen(
         state = oneTapState,
         clientId = Constants.GOOGLE_CLOUD_CLIENT_ID,
         onTokenIdReceived = { token ->
-            onTokenReceived(token)
+            val credential = GoogleAuthProvider.getCredential(token, null)
+            FirebaseAuth.getInstance().signInWithCredential(credential)
+                .addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        onSuccessfulFirebaseSignIn(token)
+                    } else {
+                        result.exception?.let { onFailedSignIn(it) }
+                    }
+                }
         }, onDialogDismissed = { message ->
             onReceivingDismissed(message)
         })

@@ -21,8 +21,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.yourdiabetesdiary.presentation.components.custom_states.rememberGalleryState
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
@@ -30,10 +33,12 @@ import com.example.yourdiabetesdiary.presentation.screens.composition.Compositio
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
 import com.example.yourdiabetesdiary.util.Constants
+import com.example.yourdiabetesdiary.util.getImageType
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.stevdzasan.messagebar.rememberMessageBarState
 import com.stevdzasan.onetap.rememberOneTapSignInState
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -97,7 +102,7 @@ private fun NavGraphBuilder.authenticationRoute(
                 oneTapState.open()
                 viewModel.setLoading(true)
             },
-            onTokenReceived = { token ->
+            onSuccessfulFirebaseSignIn = { token ->
                 Log.d("MONGO_ATLAS", token)
                 viewModel.signInWithMongoAtlas(
                     token = token,
@@ -108,6 +113,10 @@ private fun NavGraphBuilder.authenticationRoute(
                         Log.d("MONGO_ATLAS", error.message.toString())
                         authResultState.addError(Exception(error))
                     })
+            },
+            onFailedSignIn = { ex ->
+                authResultState.addError(Exception("Auth error: ${ex.message}"))
+                viewModel.setLoading(false)
             },
             onReceivingDismissed = { cause ->
                 authResultState.addError(Exception(cause))
@@ -212,12 +221,22 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             derivedStateOf { pagerState.currentPage }
         }
 
+        val galleryState = viewModel.galleryState
+
+        Log.d("TEST_IMAGE_SELECTION", "setupNavHost: ${galleryState.value}")
+
         CompositionScreen(
             date = entry.date,
             mood = { Mood.values()[currentPage.value].name },
             pagerState = pagerState,
             screenState = entry,
             navigateBack = navigateBack,
+            galleryState = galleryState,
+            onImageSelected = { uri ->
+                Log.d("TEST_IMAGE_SELECTION", "$uri")
+                val type = context.getImageType(uri)
+                viewModel.addImage(uri, type)
+            },
             onDescriptionChanged = { desc ->
                 viewModel.setNewDescription(desc)
             },
@@ -237,17 +256,20 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                     diary = diary.apply {
                         this.mood = Mood.values()[currentPage.value].name
                         this._id =
-                            if (entry.selectedDiaryEntryId != null)
+                            if (entry.selectedDiaryEntryId != null) {
                                 ObjectId(entry.selectedDiaryEntryId)
-                            else
+                            } else {
                                 ObjectId.invoke()
+                            }
+                        this.images = viewModel.galleryState.value.images.map { it.remotePath }.toRealmList()
                     },
                     onSuccess = {
                         Log.d("TEST_STORING", "navigationing back")
                         navigateBack()
                     },
                     onFailure = { error ->
-                        Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Error occurred: $error", Toast.LENGTH_SHORT)
+                            .show()
                         navigateBack()
                     }
                 )

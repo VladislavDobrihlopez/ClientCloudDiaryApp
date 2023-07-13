@@ -1,5 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.navigation.Screen
+import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
 import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -27,6 +32,9 @@ class CompositionViewModel(
     private val _uiState = mutableStateOf(CompositionScreenState())
     val uiState: State<CompositionScreenState>
         get() = _uiState
+
+    private val _galleryState = mutableStateOf(GalleryState())
+    val galleryState: State<GalleryState> = _galleryState
 
     init {
         putRoutedDiaryIdArgument()
@@ -57,6 +65,32 @@ class CompositionViewModel(
         }
     }
 
+    // forms the remote path for the photo in the following way: images/{user_id}/{photo_name}-{photo_id}.{extension}
+    fun addImage(uri: Uri, imageType: String) {
+        val remotePath =
+            "images/${FirebaseAuth.getInstance().currentUser?.uid}/${uri.lastPathSegment}-${System.currentTimeMillis()}.${imageType}"
+        Log.d("ADD_IMAGE", "addImage: $remotePath")
+        _galleryState.value = GalleryState.setupImagesBasedOnPrevious(galleryState.value).apply {
+            addImage(GalleryItem(remotePath = remotePath, localUri = uri))
+        }
+    }
+
+    fun uploadImages() {
+        with(FirebaseStorage.getInstance().reference) {
+            galleryState.value.images.forEach { image ->
+                Log.d("TEST_STORING", "a new to upload: $image")
+                val meta = child(image.remotePath)
+                meta.putFile(image.localUri)
+                    .addOnFailureListener { ex ->
+                        Log.d("TEST_STORING", "loading error: $ex")
+                    }
+                    .addOnSuccessListener {
+                        Log.d("TEST_STORING", "success loading")
+                    }
+            }
+        }
+    }
+
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
@@ -67,6 +101,7 @@ class CompositionViewModel(
                 Log.d("TEST_STORING", "$result")
                 when (result) {
                     is RequestState.Success -> {
+                        uploadImages()
                         withContext(Dispatchers.Main) {
                             onSuccess()
                         }
