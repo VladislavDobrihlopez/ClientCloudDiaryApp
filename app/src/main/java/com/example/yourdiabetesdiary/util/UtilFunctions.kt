@@ -43,14 +43,11 @@ fun retrieveImagesFromFirebaseStorage(
 ) {
     val storageReference = FirebaseStorage.getInstance().reference
     imagesUrls.map { it.trim()}.forEachIndexed { index, remoteFirebasePath ->
-        Log.d("retrieveImagesFromFirebaseStorage", "in query: $remoteFirebasePath")
-
         if (remoteFirebasePath.isEmpty()) {
             onFailure(IllegalStateException("Url is somehow empty"))
         }
         storageReference.child(remoteFirebasePath).downloadUrl
             .addOnSuccessListener { firebaseUrl ->
-                Log.d("retrieveImagesFromFirebaseStorage", "downloaded: $firebaseUrl")
                 onCompletedDownloadingItem(firebaseUrl)
                 if (index == imagesUrls.lastIndex) {
                     onWholeWorkCompleted()

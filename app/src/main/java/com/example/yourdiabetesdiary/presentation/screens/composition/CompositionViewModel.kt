@@ -64,7 +64,7 @@ class CompositionViewModel(
                                         setNewMood(mood = mood)
                                     }
 
-                                    launch {
+                                    launch(Dispatchers.IO) {
                                         retrieveImagesFromFirebaseStorage(imagesUrls = images.toList(),
                                             onCompletedDownloadingItem = { url ->
                                                 _galleryState.value =
