@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.example.yourdiabetesdiary.R
 import com.example.yourdiabetesdiary.ui.theme.Elevation
 import java.lang.Integer.max
 
@@ -58,6 +59,7 @@ fun Gallery(
                         .size(imageSize)
                         .clip(imageShape),
                     model = ImageRequest.Builder(LocalContext.current)
+                        .placeholder(R.drawable.mysterious)
                         .crossfade(true)
                         .data(url)
                         .diskCachePolicy(CachePolicy.ENABLED)

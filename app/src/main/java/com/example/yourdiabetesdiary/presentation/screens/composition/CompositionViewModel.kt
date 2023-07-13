@@ -14,6 +14,7 @@ import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
 import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import java.time.Instant
@@ -54,10 +56,32 @@ class CompositionViewModel(
                             Log.d("TEST_DIARY", "mood: ${requestResult.data.mood}")
 
                             with(requestResult.data) {
-                                setNewDate(date = date.toInstant())
-                                setNewTitle(title = title)
-                                setNewDescription(description = description)
-                                setNewMood(mood = mood)
+                                supervisorScope {
+                                    launch {
+                                        setNewDate(date = date.toInstant())
+                                        setNewTitle(title = title)
+                                        setNewDescription(description = description)
+                                        setNewMood(mood = mood)
+                                    }
+
+                                    launch(Dispatchers.IO) {
+                                        retrieveImagesFromFirebaseStorage(imagesUrls = images.toList(),
+                                            onCompletedDownloadingItem = { url ->
+                                                _galleryState.value =
+                                                    GalleryState.setupImagesBasedOnPrevious(
+                                                        _galleryState.value
+                                                    ).apply {
+                                                        addImage(
+                                                            GalleryItem(
+                                                                localUri = url,
+                                                                remotePath = createRemotePath(url.toString())
+                                                            )
+                                                        )
+                                                    }
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -65,14 +89,21 @@ class CompositionViewModel(
         }
     }
 
+    private fun createRemotePath(firebaseUrl: String): String {
+        val chunks = firebaseUrl.split("%2F")
+        val imageName = chunks[2].split("?").first()
+        return "images/${FirebaseAuth.getInstance().currentUser?.uid}/$imageName"
+    }
+
     // forms the remote path for the photo in the following way: images/{user_id}/{photo_name}-{photo_id}.{extension}
     fun addImage(uri: Uri, imageType: String) {
         val remotePath =
             "images/${FirebaseAuth.getInstance().currentUser?.uid}/${uri.lastPathSegment}-${System.currentTimeMillis()}.${imageType}"
         Log.d("ADD_IMAGE", "addImage: $remotePath")
-        _galleryState.value = GalleryState.setupImagesBasedOnPrevious(galleryState.value).apply {
-            addImage(GalleryItem(remotePath = remotePath, localUri = uri))
-        }
+        _galleryState.value =
+            GalleryState.setupImagesBasedOnPrevious(galleryState.value).apply {
+                addImage(GalleryItem(remotePath = remotePath, localUri = uri))
+            }
     }
 
     fun uploadImages() {

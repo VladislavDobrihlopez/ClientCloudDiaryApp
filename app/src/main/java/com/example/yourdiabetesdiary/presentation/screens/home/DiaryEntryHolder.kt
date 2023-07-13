@@ -1,5 +1,8 @@
 package com.example.yourdiabetesdiary.presentation.screens.home
 
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -24,14 +27,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -40,9 +46,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.Gallery
 import com.example.yourdiabetesdiary.ui.theme.Elevation
+import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
 import com.example.yourdiabetesdiary.util.toInstant
 import io.realm.kotlin.ext.realmListOf
 import java.text.SimpleDateFormat
@@ -55,12 +63,46 @@ private val DEFAULT_LINE_HEIGHT = 14.dp
 @Composable
 fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
     val localDensity = LocalDensity.current
+    val context = LocalContext.current
     val componentHeight = remember {
         mutableStateOf(DEFAULT_LINE_HEIGHT)
     }
     val galleryOpened = remember {
         mutableStateOf(false)
     }
+
+    val galleryInLoadingState = remember {
+        mutableStateOf(false)
+    }
+
+    val downloadedImagesState = remember {
+        mutableStateListOf<Uri>()
+    }
+
+    LaunchedEffect(key1 = galleryOpened.value) {
+        if (!galleryOpened.value) return@LaunchedEffect
+
+        if (downloadedImagesState.isEmpty()) {
+            galleryInLoadingState.value = true
+            retrieveImagesFromFirebaseStorage(
+                imagesUrls = entry.images,
+                onCompletedDownloadingItem = { uri ->
+                    downloadedImagesState.add(uri)
+                },
+                onFailure = { ex ->
+                    Log.d("retrieveImagesFromFirebaseStorage", "onFailure: ${ex.message}")
+                    Toast.makeText(context, "Error when loading images", Toast.LENGTH_LONG)
+                        .show()
+                    galleryInLoadingState.value = false
+                    galleryOpened.value = false
+                },
+                onWholeWorkCompleted = {
+                    galleryInLoadingState.value = false
+                }
+            )
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,7 +161,7 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
                                 )
                     ) {
                         Column(modifier = Modifier.padding(all = 14.dp)) {
-                            Gallery(images = entry.images)
+                            Gallery(images = downloadedImagesState.map { it.toString() })
                         }
                     }
                 }
