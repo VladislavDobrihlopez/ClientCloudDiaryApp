@@ -1,5 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.gestures.Orientation
@@ -28,7 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +45,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.Mood
+import com.example.yourdiabetesdiary.presentation.components.GalleryUploader
+import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -58,6 +61,8 @@ fun CompositionContent(
     paddingValues: PaddingValues,
     title: String,
     description: String,
+    onImageSelected: (Uri) -> Unit,
+    galleryState: State<GalleryState>,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
@@ -136,11 +141,12 @@ fun CompositionContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-
             TextField(
-                modifier = Modifier.fillMaxSize().onFocusChanged { focusState ->
-                    isDescriptionFocused.value = focusState.hasFocus
-                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onFocusChanged { focusState ->
+                        isDescriptionFocused.value = focusState.hasFocus
+                    },
                 value = description,
                 onValueChange = onDescriptionChanged,
                 placeholder = { Text(text = "Description") },
@@ -157,7 +163,18 @@ fun CompositionContent(
                 }),
             )
         }
+
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom) {
+            Spacer(modifier = Modifier.height(12.dp))
+            GalleryUploader(
+                onImageAdd = {
+
+                }, onImageSelected = { uri ->
+                    onImageSelected(uri)
+                }, onImageClicked = { galleryItem ->
+
+                }, state = galleryState
+            )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
                 modifier = Modifier

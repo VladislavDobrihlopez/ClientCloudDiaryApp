@@ -21,8 +21,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.yourdiabetesdiary.presentation.components.custom_states.rememberGalleryState
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
@@ -212,12 +215,23 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             derivedStateOf { pagerState.currentPage }
         }
 
+        val galleryState = rememberGalleryState()
+
+        Log.d("TEST_IMAGE_SELECTION", "setupNavHost: ${galleryState.value}")
+
         CompositionScreen(
             date = entry.date,
             mood = { Mood.values()[currentPage.value].name },
             pagerState = pagerState,
             screenState = entry,
             navigateBack = navigateBack,
+            galleryState = galleryState,
+            onImageSelected = { uri ->
+                Log.d("TEST_IMAGE_SELECTION", "$uri")
+                galleryState.value = GalleryState.setupImagesBasedOnPrevious(galleryState.value).apply {
+                    addImage(GalleryItem(localUri = uri))
+                }
+            },
             onDescriptionChanged = { desc ->
                 viewModel.setNewDescription(desc)
             },

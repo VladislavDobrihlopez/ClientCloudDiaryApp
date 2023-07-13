@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerBasedShape
@@ -20,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +37,7 @@ fun Gallery(
     modifier: Modifier = Modifier,
     images: List<String>,
     imageSize: Dp = 40.dp,
-    spacedBy: Dp = 10.dp,
+    spacedBy: Dp = 4.dp,
     imageShape: CornerBasedShape = Shapes().small,
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -63,6 +62,7 @@ fun Gallery(
                         .data(url)
                         .diskCachePolicy(CachePolicy.ENABLED)
                         .build(),
+                    contentScale = ContentScale.Crop,
                     contentDescription = "Image №$index"
                 )
                 Spacer(modifier = Modifier.width(spacedBy))
@@ -85,14 +85,14 @@ fun NumberOfNotFittedImages(
     imageShape: CornerBasedShape,
     numberOfRemainingImages: State<Int>
 ) {
-    Box(contentAlignment = Alignment.Center) {
-        Surface(
-            modifier = Modifier
-                .size(imageSize)
-                .clip(imageShape)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
-            tonalElevation = Elevation.level2
-        ) {
+    Surface(
+        modifier = Modifier
+            .size(imageSize)
+            .clip(imageShape)
+            .background(color = MaterialTheme.colorScheme.primaryContainer),
+        tonalElevation = Elevation.level1
+    ) {
+        Box(contentAlignment = Alignment.Center) {
             Text(
                 textAlign = TextAlign.Center,
                 text = "+${numberOfRemainingImages.value}",

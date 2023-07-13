@@ -59,7 +59,7 @@ fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
         mutableStateOf(DEFAULT_LINE_HEIGHT)
     }
     val galleryOpened = remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     Row(
         modifier = Modifier

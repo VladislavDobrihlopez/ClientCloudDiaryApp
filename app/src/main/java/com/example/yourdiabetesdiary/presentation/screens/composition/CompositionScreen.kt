@@ -1,5 +1,6 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -18,7 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import java.time.Instant
@@ -32,6 +35,8 @@ fun CompositionScreen(
     screenState: CompositionScreenState,
     date: Instant?,
     navigateBack: () -> Unit,
+    onImageSelected: (Uri) -> Unit,
+    galleryState: State<GalleryState>,
     onDeleteConfirmed: () -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
@@ -108,6 +113,8 @@ fun CompositionScreen(
             pagerState = pagerState,
             paddingValues = paddings,
             title = screenState.title,
+            onImageSelected = onImageSelected,
+            galleryState = galleryState,
             onTitleChanged = { newTitle -> onTitleChanged(newTitle) },
             description = screenState.description,
             onDescriptionChanged = { newDescription -> onDescriptionChanged(newDescription) },
@@ -116,11 +123,6 @@ fun CompositionScreen(
             }
         )
     }
-}
-
-@Composable
-fun TimeChoosingDialog() {
-
 }
 
 @Composable
