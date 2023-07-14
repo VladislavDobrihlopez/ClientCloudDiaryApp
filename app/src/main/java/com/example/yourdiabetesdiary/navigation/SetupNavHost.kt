@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -207,7 +208,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
         //val diaryEntryId = it.arguments?.getString(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY)
 
         val context = LocalContext.current
-        val viewModel: CompositionViewModel = viewModel()
+        val viewModel: CompositionViewModel = hiltViewModel()
         val pagerState = rememberPagerState()
         val entry = viewModel.uiState.value
 

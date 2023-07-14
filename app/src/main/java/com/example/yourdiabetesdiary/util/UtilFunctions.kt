@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.text.toLowerCase
+import androidx.core.net.toUri
+import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storageMetadata
 import io.realm.kotlin.types.RealmInstant
 import java.lang.IllegalStateException
 import java.time.Instant
@@ -42,7 +45,7 @@ fun retrieveImagesFromFirebaseStorage(
     onWholeWorkCompleted: () -> Unit = {}
 ) {
     val storageReference = FirebaseStorage.getInstance().reference
-    imagesUrls.map { it.trim()}.forEachIndexed { index, remoteFirebasePath ->
+    imagesUrls.map { it.trim() }.forEachIndexed { index, remoteFirebasePath ->
         if (remoteFirebasePath.isEmpty()) {
             onFailure(IllegalStateException("Url is somehow empty"))
         }
@@ -55,4 +58,19 @@ fun retrieveImagesFromFirebaseStorage(
             }
             .addOnFailureListener(onFailure)
     }
+}
+
+fun retryUploadingImage(
+    image: ImagesForUploadingDbModel,
+    whetherSuccessfullyCompleted: (Boolean) -> Unit
+) {
+    val reference = FirebaseStorage.getInstance().reference
+    reference.child(image.remotePath)
+        .putFile(Uri.parse(image.localUri), storageMetadata { }, image.sessionUri.toUri())
+        .addOnSuccessListener {
+            whetherSuccessfullyCompleted(true)
+        }
+        .addOnFailureListener {
+            whetherSuccessfullyCompleted(false)
+        }
 }

@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.models.DiaryEntry
@@ -19,6 +21,7 @@ import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -27,9 +30,12 @@ import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import java.time.Instant
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
-class CompositionViewModel(
-    private val savedStateHandle: SavedStateHandle
+@HiltViewModel
+class CompositionViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val locallyCachingDao: ImageInQueryForUploadingDao
 ) : ViewModel() {
     private val _uiState = mutableStateOf(CompositionScreenState())
     val uiState: State<CompositionScreenState>
@@ -117,6 +123,20 @@ class CompositionViewModel(
                     }
                     .addOnSuccessListener {
                         Log.d("TEST_STORING", "success loading")
+                    }
+                    .addOnProgressListener { session ->
+                        viewModelScope.launch(Dispatchers.IO) {
+                            val sessionUri = session.uploadSessionUri
+                            if (sessionUri != null) {
+                                locallyCachingDao.addImage(
+                                    model = ImagesForUploadingDbModel(
+                                        localUri = image.localUri.toString(),
+                                        remotePath = image.remotePath,
+                                        sessionUri = sessionUri.toString()
+                                    )
+                                )
+                            }
+                        }
                     }
             }
         }
