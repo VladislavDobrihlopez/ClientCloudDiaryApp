@@ -174,10 +174,14 @@ class CompositionViewModel @Inject constructor(
                 .collect { result ->
                     Log.d("TEST_DELETING", "$result")
                     when (result) {
-                        is RequestState.Success ->
+                        is RequestState.Success -> {
+                            uiState.value.selectedDiaryEntryId?.let {
+                                deleteImagesRelatedToDiary(remoteUris = galleryState.value.images.map { it.remotePath })
+                            }
                             withContext(Dispatchers.Main) {
                                 onSuccess()
                             }
+                        }
 
                         is RequestState.Error ->
                             withContext(Dispatchers.Main) {
@@ -187,6 +191,13 @@ class CompositionViewModel @Inject constructor(
                         else -> onFailure("Unexpected problem occurred")
                     }
                 }
+        }
+    }
+
+    private fun deleteImagesRelatedToDiary(remoteUris: List<String>) {
+        val storageReference = FirebaseStorage.getInstance().reference
+        remoteUris.forEach { path ->
+            storageReference.child(path).delete()
         }
     }
 
