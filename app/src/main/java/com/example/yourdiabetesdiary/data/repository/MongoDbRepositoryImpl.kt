@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
 
-object MongoDbDbRepositoryImpl : MongoDbRepository {
+object MongoDbRepositoryImpl : MongoDbRepository {
     private val app = App.Companion.create(Constants.MONGO_DB_APP_ID)
     private val currentUser = app.currentUser
     private lateinit var realm: Realm
@@ -152,7 +152,7 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
         }
     }
 
-    override suspend fun deleteDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>> {
+    override suspend fun deleteDiary(diaryId: ObjectId): RequestState<Boolean> {
         return if (isSessionValid()) {
             withContext(Dispatchers.IO) {
                 realm.write {
@@ -167,25 +167,41 @@ object MongoDbDbRepositoryImpl : MongoDbRepository {
 
                         if (diary != null) {
                             delete(diary)
-                            flow {
-                                emit(RequestState.Success(diary))
-                            }
+                            RequestState.Success(true)
                         } else {
-                            flow {
-                                emit(RequestState.Error(IllegalStateException("Diary doesn't exist")))
-                            }
+                            RequestState.Error(IllegalStateException("Diary doesn't exist"))
                         }
                     } catch (ex: Exception) {
-                        flow {
-                            emit(RequestState.Error(ex = ex))
-                        }
+                        RequestState.Error(ex = ex)
                     }
                 }
             }
         } else {
-            flow {
-                emit(RequestState.Error(ex = CustomException.UserNotAuthenticatedException()))
+            RequestState.Error(ex = CustomException.UserNotAuthenticatedException())
+        }
+    }
+
+    override suspend fun deleteAllDiaries(): RequestState<Boolean> {
+        return if (isSessionValid()) {
+            withContext(Dispatchers.IO) {
+                realm.write {
+                    try {
+                        val diary = query<DiaryEntry>(
+                            "ownerId == $0",
+                            currentUser!!.id
+                        ).find()
+
+                        delete(diary)
+
+                        Log.d("TEST_DELETING", "$diary")
+                        RequestState.Success(true)
+                    } catch (ex: Exception) {
+                        RequestState.Error(ex = ex)
+                    }
+                }
             }
+        } else {
+            RequestState.Error(ex = CustomException.UserNotAuthenticatedException())
         }
     }
 

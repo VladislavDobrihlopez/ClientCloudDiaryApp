@@ -22,11 +22,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
-import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
-import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
-import com.example.yourdiabetesdiary.presentation.components.custom_states.rememberGalleryState
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
@@ -145,8 +142,11 @@ private fun NavGraphBuilder.homeRoute(
         val openDialogState = remember {
             mutableStateOf(false)
         }
+        val openDeletionDialogState = remember {
+            mutableStateOf(false)
+        }
 
-        val viewModel: HomeViewModel = viewModel()
+        val viewModel: HomeViewModel = hiltViewModel()
         val state = viewModel.diaries
 
         LaunchedEffect(key1 = state.value) {
@@ -169,7 +169,10 @@ private fun NavGraphBuilder.homeRoute(
             onSignOut = {
                 openDialogState.value = true
             },
-            onDiaryChose = navigateToComposeScreenWithArguments
+            onDiaryChose = navigateToComposeScreenWithArguments,
+            onDeleteAllDiariesClicked = {
+                openDeletionDialogState.value = true
+            }
         )
 
         CustomAlertDialog(
@@ -189,6 +192,32 @@ private fun NavGraphBuilder.homeRoute(
             },
             onDialogClosed = {
                 openDialogState.value = false
+            }
+        )
+
+        val context = LocalContext.current
+
+        CustomAlertDialog(
+            title = "Delete all diaries dialog",
+            message = "Are you sure you want to permanently delete all diaries?",
+            isDialogOpened = openDeletionDialogState,
+            onYesClicked = {
+                viewModel.deleteAllDiaries(
+                    onSuccess = {
+                        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            navDrawerState.close()
+                        }
+                    },
+                    onError = { ex ->
+                        Toast.makeText(context, "${ex.message}", Toast.LENGTH_LONG).show()
+                        scope.launch {
+                            navDrawerState.close()
+                        }
+                    })
+            },
+            onDialogClosed = {
+                openDeletionDialogState.value = false
             }
         )
     }
@@ -262,7 +291,8 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                             } else {
                                 ObjectId.invoke()
                             }
-                        this.images = viewModel.galleryState.value.images.map { it.remotePath }.toRealmList()
+                        this.images =
+                            viewModel.galleryState.value.images.map { it.remotePath }.toRealmList()
                     },
                     onSuccess = {
                         Log.d("TEST_STORING", "navigationing back")
