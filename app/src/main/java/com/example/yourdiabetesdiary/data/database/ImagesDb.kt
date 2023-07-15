@@ -2,6 +2,8 @@ package com.example.yourdiabetesdiary.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 

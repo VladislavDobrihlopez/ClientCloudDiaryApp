@@ -172,6 +172,9 @@ private fun NavGraphBuilder.homeRoute(
             onDiaryChose = navigateToComposeScreenWithArguments,
             onDeleteAllDiariesClicked = {
                 openDeletionDialogState.value = true
+            },
+            onFilterClicked = { date ->
+                viewModel.setDate(date)
             }
         )
 

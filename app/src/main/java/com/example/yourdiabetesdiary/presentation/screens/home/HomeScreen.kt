@@ -42,8 +42,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.data.repository.DiariesType
+import com.example.yourdiabetesdiary.domain.DiariesType
 import com.example.yourdiabetesdiary.domain.RequestState
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -55,7 +56,8 @@ fun HomeScreen(
     navigateToCompositionScreen: () -> Unit,
     onSignOut: () -> Unit,
     onDiaryChose: (String) -> Unit,
-    onDeleteAllDiariesClicked: () -> Unit
+    onDeleteAllDiariesClicked: () -> Unit,
+    onFilterClicked: (LocalDate?) -> Unit
 ) {
     var padding by remember {
         mutableStateOf(PaddingValues())
@@ -77,7 +79,7 @@ fun HomeScreen(
                 HomeTopAppBar(
                     scrollBehavior = scrollBehavior,
                     onNavigationMenuClicked = { onMenuClicked() },
-                    onFilterClicked = { })
+                    onFilterClicked = onFilterClicked)
             }, floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.padding(

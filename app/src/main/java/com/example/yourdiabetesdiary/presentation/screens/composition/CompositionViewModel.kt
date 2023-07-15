@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
-import com.example.yourdiabetesdiary.data.repository.MongoDbRepositoryImpl
+import com.example.yourdiabetesdiary.data.repositoryImpl.MongoDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem

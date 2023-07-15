@@ -63,7 +63,12 @@ fun retryUploadingImage(
 ) {
     val reference = FirebaseStorage.getInstance().reference
     reference.child(image.remotePath)
-        .putFile(Uri.parse(image.localUri), storageMetadata { }, image.sessionUri.toUri())
+        // firebase documentation
+        .putFile(
+            image.localUri.toUri(),
+            storageMetadata { },
+            image.sessionUri.toUri()
+        )
         .addOnSuccessListener {
             whetherSuccessfullyCompleted(true)
         }

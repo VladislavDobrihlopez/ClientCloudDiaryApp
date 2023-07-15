@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.data.database
+package com.example.yourdiabetesdiary.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -2,7 +2,7 @@ package com.example.yourdiabetesdiary.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.example.yourdiabetesdiary.data.LocalDataSource
+import com.example.yourdiabetesdiary.data.LocalDataSourceConstants
 import com.example.yourdiabetesdiary.data.database.ImagesDb
 import dagger.Module
 import dagger.Provides
@@ -20,7 +20,7 @@ object DataModule {
         Room.databaseBuilder(
             context,
             ImagesDb::class.java,
-            LocalDataSource.imagesForUploadingDbName
+            LocalDataSourceConstants.imagesForUploadingDbName
         ).build()
 
     @Singleton

@@ -10,8 +10,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.navigation.SetupNavHost
 import com.example.yourdiabetesdiary.ui.theme.YourDiabetesDiaryTheme
@@ -31,14 +31,12 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var imagesUploadingDao: ImageInQueryForUploadingDao
-
     @Inject
     lateinit var imagesDeletionDao: ImageInQueryForDeletionDao
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Firebase.initialize(this)
 
         var keepDisplayingSplash = true
 
@@ -46,6 +44,7 @@ class MainActivity : ComponentActivity() {
             keepDisplayingSplash
         }
 
+        Firebase.initialize(this)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             YourDiabetesDiaryTheme(dynamicColor = false) {

@@ -1,11 +1,14 @@
-package com.example.yourdiabetesdiary.data.repository
+package com.example.yourdiabetesdiary.data.repositoryImpl
 
 import android.util.Log
+import com.example.yourdiabetesdiary.domain.DiariesType
+import com.example.yourdiabetesdiary.domain.MongoDbRepository
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.domain.exceptions.CustomException
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.util.Constants
 import com.example.yourdiabetesdiary.util.toInstant
+import com.example.yourdiabetesdiary.util.toRealmInstant
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.log.LogLevel
@@ -18,7 +21,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 object MongoDbRepositoryImpl : MongoDbRepository {
     private val app = App.Companion.create(Constants.MONGO_DB_APP_ID)
@@ -54,6 +60,44 @@ object MongoDbRepositoryImpl : MongoDbRepository {
                     .map { result ->
                         Log.d("TEST_DIARY", "${result.list}")
                         Log.d("TEST_DIARY", "${currentUser!!.id}")
+                        RequestState.Success(data = result.list.groupBy { diaryEntry ->
+                            diaryEntry.date.toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                        })
+                    }
+            } catch (ex: Exception) {
+                flow {
+                    emit(RequestState.Error(ex))
+                }
+            }
+        } else {
+            flow {
+                emit(RequestState.Error(CustomException.UserNotAuthenticatedException()))
+            }
+        }
+    }
+
+    override fun retrieveFilteredDiaries(localDate: LocalDate): Flow<RequestState<DiariesType>> {
+        return if (isSessionValid()) {
+            try {
+                val instant = ZonedDateTime.of(
+                    localDate,
+                    LocalTime.MIDNIGHT,
+                    ZoneId.systemDefault()
+                )
+
+                realm.query<DiaryEntry>(
+                    query = "ownerId == $0 AND date <= $1 AND date >= $2 ",
+                    currentUser!!.id,
+                    instant.plusDays(1).toInstant().toRealmInstant(),
+                    instant.toInstant().toRealmInstant()
+                )
+                    .sort(property = "date", sortOrder = Sort.DESCENDING)
+                    .asFlow()
+                    .map { result ->
+                        Log.d("TEST_DIARY", "2: ${result.list}")
+                        Log.d("TEST_DIARY", "2: ${currentUser!!.id}")
                         RequestState.Success(data = result.list.groupBy { diaryEntry ->
                             diaryEntry.date.toInstant()
                                 .atZone(ZoneId.systemDefault())

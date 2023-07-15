@@ -5,12 +5,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
-import com.example.yourdiabetesdiary.data.repository.DiariesType
-import com.example.yourdiabetesdiary.data.repository.MongoDbRepositoryImpl
-import com.example.yourdiabetesdiary.data.repository.MongoDbRepository
 import com.example.yourdiabetesdiary.domain.ConnectivityObserver
+import com.example.yourdiabetesdiary.domain.DiariesType
+import com.example.yourdiabetesdiary.domain.MongoDbRepository
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.domain.exceptions.CustomException
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,17 +29,31 @@ class HomeViewModel @Inject constructor(
     val diaries: MutableState<RequestState<DiariesType>> = mutableStateOf(RequestState.Idle)
     private val connectivityStatus =
         mutableStateOf(ConnectivityObserver.Status.LOST)
+    private val selectedDate = mutableStateOf<LocalDate?>(null)
 
     init {
-        observe()
+        observeDiaries()
         observeConnectivity()
     }
 
-    private fun observe() {
+    fun setDate(date: LocalDate?) {
+        selectedDate.value = date
+        observeDiaries()
+    }
+
+    private fun observeDiaries() {
         viewModelScope.launch {
-            MongoDbRepositoryImpl.retrieveDiaries().collect { result ->
-                Log.d("TEST_DIARY", result.toString())
-                diaries.value = result
+            val date = selectedDate.value
+            if (date == null) {
+                remoteDb.retrieveDiaries().collect { result ->
+                    Log.d("TEST_DIARY", "1: $result")
+                    diaries.value = result
+                }
+            } else {
+                remoteDb.retrieveFilteredDiaries(date).collect { result ->
+                    Log.d("TEST_DIARY", "2: $result`")
+                    diaries.value = result
+                }
             }
         }
     }
