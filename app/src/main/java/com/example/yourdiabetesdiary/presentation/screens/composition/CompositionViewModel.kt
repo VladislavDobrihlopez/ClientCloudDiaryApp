@@ -7,7 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
@@ -35,7 +37,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CompositionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val locallyCachingDao: ImageInQueryForUploadingDao
+    private val pendingImagesForUploadingDao: ImageInQueryForUploadingDao,
+    private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
 ) : ViewModel() {
     private val _uiState = mutableStateOf(CompositionScreenState())
     val uiState: State<CompositionScreenState>
@@ -135,7 +138,7 @@ class CompositionViewModel @Inject constructor(
                         viewModelScope.launch(Dispatchers.IO) {
                             val sessionUri = session.uploadSessionUri
                             if (sessionUri != null) {
-                                locallyCachingDao.addImage(
+                                pendingImagesForUploadingDao.addImage(
                                     model = ImagesForUploadingDbModel(
                                         localUri = image.localUri.toString(),
                                         remotePath = image.remotePath,
@@ -167,7 +170,7 @@ class CompositionViewModel @Inject constructor(
                 Log.d("TEST_STORING", "$result")
                 when (result) {
                     is RequestState.Success -> {
-                        deleteImagesRelatedToDiary(galleryState.value.imagesForDeletion.map {it.remotePath})
+                        deleteImagesRelatedToDiary(galleryState.value.imagesForDeletion.map { it.remotePath })
                         uploadImages()
                         Log.d("TEST_STORING", "storeDiary: ${galleryState.toString()}")
                         withContext(Dispatchers.Main) {
@@ -216,6 +219,15 @@ class CompositionViewModel @Inject constructor(
         val storageReference = FirebaseStorage.getInstance().reference
         remoteUris.forEach { path ->
             storageReference.child(path).delete()
+                .addOnFailureListener {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        pendingImagesForDeletionDao.addImage(
+                            model = ImagesForDeletionDbModel(
+                                remotePath = path
+                            )
+                        )
+                    }
+                }
         }
     }
 

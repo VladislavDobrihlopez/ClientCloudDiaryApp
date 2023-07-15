@@ -9,7 +9,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -26,5 +25,9 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideDao(db: ImagesDb) = db.imageInQueryForUploadingApiService()
+    fun provideUploadingDao(db: ImagesDb) = db.imageInQueryForUploadingDaoService()
+
+    @Singleton
+    @Provides
+    fun provideDeletionDao(db: ImagesDb) = db.imageInQueryForDeletionDaoService()
 }
