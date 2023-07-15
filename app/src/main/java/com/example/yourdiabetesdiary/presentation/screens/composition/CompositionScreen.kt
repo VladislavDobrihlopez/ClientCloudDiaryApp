@@ -146,6 +146,7 @@ fun CompositionScreen(
                         },
                         onDeleteClicked = {
                             onDeleteGalleryImage(it)
+                            zoomableImage.value = null
                         }
                     )
                 }

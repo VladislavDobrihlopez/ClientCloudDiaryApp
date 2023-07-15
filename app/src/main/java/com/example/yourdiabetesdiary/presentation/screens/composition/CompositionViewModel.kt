@@ -49,7 +49,14 @@ class CompositionViewModel @Inject constructor(
         getDiaryInfo()
     }
 
-    fun getDiaryInfo() {
+    private fun putRoutedDiaryIdArgument() {
+        _uiState.value =
+            CompositionScreenState(selectedDiaryEntryId = savedStateHandle.get<String>(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY))
+    }
+
+    private fun isInEditMode() = _uiState.value.selectedDiaryEntryId != null
+
+    private fun getDiaryInfo() {
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
@@ -142,6 +149,14 @@ class CompositionViewModel @Inject constructor(
         }
     }
 
+    fun queueImageForDeletion(galleryItem: GalleryItem) {
+        _galleryState.value = GalleryState.setupImagesBasedOnPrevious(_galleryState.value).apply {
+            removeInTwoStorages(galleryItem)
+        }
+        Log.d("TEST_STORING", "queueImageForDeletion: ${galleryItem.toString()}")
+        Log.d("TEST_STORING", "queueImageForDeletion: ${_galleryState.value}")
+    }
+
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
@@ -152,7 +167,9 @@ class CompositionViewModel @Inject constructor(
                 Log.d("TEST_STORING", "$result")
                 when (result) {
                     is RequestState.Success -> {
+                        deleteImagesRelatedToDiary(galleryState.value.imagesForDeletion.map {it.remotePath})
                         uploadImages()
+                        Log.d("TEST_STORING", "storeDiary: ${galleryState.toString()}")
                         withContext(Dispatchers.Main) {
                             onSuccess()
                         }
@@ -195,6 +212,7 @@ class CompositionViewModel @Inject constructor(
     }
 
     private fun deleteImagesRelatedToDiary(remoteUris: List<String>) {
+        Log.d("TEST_STORING", "remote: $remoteUris")
         val storageReference = FirebaseStorage.getInstance().reference
         remoteUris.forEach { path ->
             storageReference.child(path).delete()
@@ -220,11 +238,4 @@ class CompositionViewModel @Inject constructor(
     fun setNewDateAndTime(zonedDateTime: ZonedDateTime) {
         _uiState.value = _uiState.value.copy(date = zonedDateTime.toInstant())
     }
-
-    private fun putRoutedDiaryIdArgument() {
-        _uiState.value =
-            CompositionScreenState(selectedDiaryEntryId = savedStateHandle.get<String>(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY))
-    }
-
-    private fun isInEditMode() = _uiState.value.selectedDiaryEntryId != null
 }

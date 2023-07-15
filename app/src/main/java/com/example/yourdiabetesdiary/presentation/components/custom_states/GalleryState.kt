@@ -23,7 +23,7 @@ class GalleryState {
 
     fun removeInTwoStorages(item: GalleryItem) {
         _images.remove(item)
-        _imagesForDeletion.remove(item)
+        _imagesForDeletion.add(item)
     }
 
     fun clearAllSelectedImagesForDeletion() {

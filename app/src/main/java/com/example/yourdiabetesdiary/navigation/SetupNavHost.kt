@@ -280,7 +280,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
                 viewModel.setNewDateAndTime(zonedDateTime = zonedDateTime)
             },
             onDeleteGalleryImage = { galleryItem ->
-
+                viewModel.queueImageForDeletion(galleryItem)
             }
         )
     }
