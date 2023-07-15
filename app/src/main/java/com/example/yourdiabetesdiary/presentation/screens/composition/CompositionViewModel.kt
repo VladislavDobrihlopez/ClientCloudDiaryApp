@@ -7,7 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
@@ -35,7 +37,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CompositionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val locallyCachingDao: ImageInQueryForUploadingDao
+    private val pendingImagesForUploadingDao: ImageInQueryForUploadingDao,
+    private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
 ) : ViewModel() {
     private val _uiState = mutableStateOf(CompositionScreenState())
     val uiState: State<CompositionScreenState>
@@ -49,7 +52,14 @@ class CompositionViewModel @Inject constructor(
         getDiaryInfo()
     }
 
-    fun getDiaryInfo() {
+    private fun putRoutedDiaryIdArgument() {
+        _uiState.value =
+            CompositionScreenState(selectedDiaryEntryId = savedStateHandle.get<String>(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY))
+    }
+
+    private fun isInEditMode() = _uiState.value.selectedDiaryEntryId != null
+
+    private fun getDiaryInfo() {
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
@@ -128,7 +138,7 @@ class CompositionViewModel @Inject constructor(
                         viewModelScope.launch(Dispatchers.IO) {
                             val sessionUri = session.uploadSessionUri
                             if (sessionUri != null) {
-                                locallyCachingDao.addImage(
+                                pendingImagesForUploadingDao.addImage(
                                     model = ImagesForUploadingDbModel(
                                         localUri = image.localUri.toString(),
                                         remotePath = image.remotePath,
@@ -142,6 +152,14 @@ class CompositionViewModel @Inject constructor(
         }
     }
 
+    fun queueImageForDeletion(galleryItem: GalleryItem) {
+        _galleryState.value = GalleryState.setupImagesBasedOnPrevious(_galleryState.value).apply {
+            removeInTwoStorages(galleryItem)
+        }
+        Log.d("TEST_STORING", "queueImageForDeletion: ${galleryItem.toString()}")
+        Log.d("TEST_STORING", "queueImageForDeletion: ${_galleryState.value}")
+    }
+
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
@@ -152,7 +170,9 @@ class CompositionViewModel @Inject constructor(
                 Log.d("TEST_STORING", "$result")
                 when (result) {
                     is RequestState.Success -> {
+                        deleteImagesRelatedToDiary(galleryState.value.imagesForDeletion.map { it.remotePath })
                         uploadImages()
+                        Log.d("TEST_STORING", "storeDiary: ${galleryState.toString()}")
                         withContext(Dispatchers.Main) {
                             onSuccess()
                         }
@@ -174,10 +194,14 @@ class CompositionViewModel @Inject constructor(
                 .collect { result ->
                     Log.d("TEST_DELETING", "$result")
                     when (result) {
-                        is RequestState.Success ->
+                        is RequestState.Success -> {
+                            uiState.value.selectedDiaryEntryId?.let {
+                                deleteImagesRelatedToDiary(remoteUris = galleryState.value.images.map { it.remotePath })
+                            }
                             withContext(Dispatchers.Main) {
                                 onSuccess()
                             }
+                        }
 
                         is RequestState.Error ->
                             withContext(Dispatchers.Main) {
@@ -185,6 +209,23 @@ class CompositionViewModel @Inject constructor(
                             }
 
                         else -> onFailure("Unexpected problem occurred")
+                    }
+                }
+        }
+    }
+
+    private fun deleteImagesRelatedToDiary(remoteUris: List<String>) {
+        Log.d("TEST_STORING", "remote: $remoteUris")
+        val storageReference = FirebaseStorage.getInstance().reference
+        remoteUris.forEach { path ->
+            storageReference.child(path).delete()
+                .addOnFailureListener {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        pendingImagesForDeletionDao.addImage(
+                            model = ImagesForDeletionDbModel(
+                                remotePath = path
+                            )
+                        )
                     }
                 }
         }
@@ -209,11 +250,4 @@ class CompositionViewModel @Inject constructor(
     fun setNewDateAndTime(zonedDateTime: ZonedDateTime) {
         _uiState.value = _uiState.value.copy(date = zonedDateTime.toInstant())
     }
-
-    private fun putRoutedDiaryIdArgument() {
-        _uiState.value =
-            CompositionScreenState(selectedDiaryEntryId = savedStateHandle.get<String>(Screen.DiaryEntry.DIARY_ID_ARGUMENT_KEY))
-    }
-
-    private fun isInEditMode() = _uiState.value.selectedDiaryEntryId != null
 }

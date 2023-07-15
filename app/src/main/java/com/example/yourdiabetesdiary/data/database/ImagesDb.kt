@@ -1,13 +1,15 @@
 package com.example.yourdiabetesdiary.data.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.yourdiabetesdiary.data.LocalDataSource
+import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 
-@Database(entities = [ImagesForUploadingDbModel::class], version = 1, exportSchema = false)
+@Database(
+    entities = [ImagesForUploadingDbModel::class, ImagesForDeletionDbModel::class],
+    version = 3,
+    exportSchema = false
+)
 abstract class ImagesDb : RoomDatabase() {
 //    private var _instance: ImagesDb? = null
 //    private val monitor = Object()
@@ -24,5 +26,6 @@ abstract class ImagesDb : RoomDatabase() {
 //        }
 //    }
 
-    abstract fun imageInQueryForUploadingApiService(): ImageInQueryForUploadingDao
+    abstract fun imageInQueryForUploadingDaoService(): ImageInQueryForUploadingDao
+    abstract fun imageInQueryForDeletionDaoService(): ImageInQueryForDeletionDao
 }

@@ -10,11 +10,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.navigation.SetupNavHost
 import com.example.yourdiabetesdiary.ui.theme.YourDiabetesDiaryTheme
 import com.example.yourdiabetesdiary.util.Constants
+import com.example.yourdiabetesdiary.util.retryDeletingImage
 import com.example.yourdiabetesdiary.util.retryUploadingImage
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -28,7 +30,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var imagesDao: ImageInQueryForUploadingDao
+    lateinit var imagesUploadingDao: ImageInQueryForUploadingDao
+
+    @Inject
+    lateinit var imagesDeletionDao: ImageInQueryForDeletionDao
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,26 +60,49 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-        postPendingImages(scope = lifecycleScope, pendingImageDao = imagesDao)
+        managePendingImages(
+            scope = lifecycleScope,
+            pendingImageDao = imagesUploadingDao,
+            pendingImageDeletionDao = imagesDeletionDao
+        )
     }
 
-    private fun postPendingImages(
+    private fun managePendingImages(
         scope: CoroutineScope,
-        pendingImageDao: ImageInQueryForUploadingDao
+        pendingImageDao: ImageInQueryForUploadingDao,
+        pendingImageDeletionDao: ImageInQueryForDeletionDao
     ) {
         scope.launch(Dispatchers.IO) {
-            val allImages = pendingImageDao.getAllImages()
-            allImages.forEach { image ->
-                retryUploadingImage(
-                    image = image,
-                    whetherSuccessfullyCompleted = { isSuccessfully ->
-                        if (isSuccessfully) {
-                            scope.launch(Dispatchers.IO) {
-                                pendingImageDao.clearAll(imageId = image.id)
+            launch {
+                val allImagesForUploading = pendingImageDao.getAllImages()
+                allImagesForUploading.forEach { image ->
+                    retryUploadingImage(
+                        image = image,
+                        whetherSuccessfullyCompleted = { isSuccessfully ->
+                            if (isSuccessfully) {
+                                scope.launch(Dispatchers.IO) {
+                                    pendingImageDao.clearAll(imageId = image.id)
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
+            }
+
+            launch {
+                val allImagesForDeletion = pendingImageDeletionDao.getAllImages()
+                allImagesForDeletion.forEach { image ->
+                    retryDeletingImage(
+                        image = image,
+                        whetherSuccessfullyCompleted = { isSuccessfully ->
+                            if (isSuccessfully) {
+                                scope.launch(Dispatchers.IO) {
+                                    pendingImageDeletionDao.clearAll(imageId = image.id)
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.yourdiabetesdiary.presentation.screens.composition
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -18,9 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.Dialog
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.example.yourdiabetesdiary.presentation.components.ZoomableImage
 import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -41,8 +44,13 @@ fun CompositionScreen(
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onSaveDiaryButtonClicked: (DiaryEntry) -> Unit,
-    onDateUpdated: (ZonedDateTime) -> Unit
+    onDateUpdated: (ZonedDateTime) -> Unit,
+    onDeleteGalleryImage: (GalleryItem) -> Unit
 ) {
+    val zoomableImage = remember {
+        mutableStateOf<GalleryItem?>(null)
+    }
+
     Scaffold(
         modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
         topBar = {
@@ -118,10 +126,32 @@ fun CompositionScreen(
             onTitleChanged = { newTitle -> onTitleChanged(newTitle) },
             description = screenState.description,
             onDescriptionChanged = { newDescription -> onDescriptionChanged(newDescription) },
+            onGalleryImageClicked = { galleryItem ->
+                zoomableImage.value = galleryItem
+            },
             onSaveDiaryButtonClicked = { diary ->
                 onSaveDiaryButtonClicked(diary)
             }
         )
+
+        AnimatedVisibility(visible = zoomableImage.value != null) {
+            Dialog(onDismissRequest = {
+                zoomableImage.value = null
+            }) {
+                zoomableImage.value?.let {
+                    ZoomableImage(
+                        url = it.localUri,
+                        onCloseClicked = {
+                            zoomableImage.value = null
+                        },
+                        onDeleteClicked = {
+                            onDeleteGalleryImage(it)
+                            zoomableImage.value = null
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

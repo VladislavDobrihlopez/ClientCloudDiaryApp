@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.presentation.components.GalleryUploader
 import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
@@ -65,6 +66,7 @@ fun CompositionContent(
     galleryState: State<GalleryState>,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onGalleryImageClicked: (GalleryItem) -> Unit,
     onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
@@ -172,7 +174,7 @@ fun CompositionContent(
                 }, onImageSelected = { uri ->
                     onImageSelected(uri)
                 }, onImageClicked = { galleryItem ->
-
+                    onGalleryImageClicked(galleryItem)
                 }, state = galleryState
             )
             Spacer(modifier = Modifier.height(12.dp))

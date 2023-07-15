@@ -2,16 +2,13 @@ package com.example.yourdiabetesdiary.util
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
-import androidx.compose.ui.text.toLowerCase
 import androidx.core.net.toUri
+import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storageMetadata
 import io.realm.kotlin.types.RealmInstant
-import java.lang.IllegalStateException
 import java.time.Instant
-import java.util.Locale
 
 fun RealmInstant.toInstant(): Instant {
     val nano = nanosecondsOfSecond
@@ -67,6 +64,21 @@ fun retryUploadingImage(
     val reference = FirebaseStorage.getInstance().reference
     reference.child(image.remotePath)
         .putFile(Uri.parse(image.localUri), storageMetadata { }, image.sessionUri.toUri())
+        .addOnSuccessListener {
+            whetherSuccessfullyCompleted(true)
+        }
+        .addOnFailureListener {
+            whetherSuccessfullyCompleted(false)
+        }
+}
+
+fun retryDeletingImage(
+    image: ImagesForDeletionDbModel,
+    whetherSuccessfullyCompleted: (Boolean) -> Unit
+) {
+    val reference = FirebaseStorage.getInstance().reference
+    reference.child(image.remotePath)
+        .delete()
         .addOnSuccessListener {
             whetherSuccessfullyCompleted(true)
         }

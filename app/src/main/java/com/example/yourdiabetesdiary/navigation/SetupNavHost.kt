@@ -278,6 +278,9 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             onDateUpdated = { zonedDateTime ->
                 Log.d("ON_DATE_UPDATED", zonedDateTime.toString())
                 viewModel.setNewDateAndTime(zonedDateTime = zonedDateTime)
+            },
+            onDeleteGalleryImage = { galleryItem ->
+                viewModel.queueImageForDeletion(galleryItem)
             }
         )
     }
