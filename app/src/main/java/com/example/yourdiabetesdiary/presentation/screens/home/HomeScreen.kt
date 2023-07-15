@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
@@ -40,8 +42,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.data.repository.DiariesType
+import com.example.yourdiabetesdiary.domain.DiariesType
 import com.example.yourdiabetesdiary.domain.RequestState
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -52,7 +55,9 @@ fun HomeScreen(
     onMenuClicked: () -> Unit,
     navigateToCompositionScreen: () -> Unit,
     onSignOut: () -> Unit,
-    onDiaryChose: (String) -> Unit
+    onDiaryChose: (String) -> Unit,
+    onDeleteAllDiariesClicked: () -> Unit,
+    onFilterClicked: (LocalDate?) -> Unit
 ) {
     var padding by remember {
         mutableStateOf(PaddingValues())
@@ -65,7 +70,8 @@ fun HomeScreen(
         onSignOut = {
             onSignOut()
         },
-        onAboutClicked = {}
+        onAboutClicked = {},
+        onDeleteAllDiariesClicked = onDeleteAllDiariesClicked
     ) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -73,7 +79,7 @@ fun HomeScreen(
                 HomeTopAppBar(
                     scrollBehavior = scrollBehavior,
                     onNavigationMenuClicked = { onMenuClicked() },
-                    onFilterClicked = { })
+                    onFilterClicked = onFilterClicked)
             }, floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.padding(
@@ -124,6 +130,7 @@ private fun NavigationDrawer(
     drawerState: DrawerState,
     onSignOut: () -> Unit,
     onAboutClicked: () -> Unit,
+    onDeleteAllDiariesClicked: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     ModalNavigationDrawer(
@@ -163,6 +170,25 @@ private fun NavigationDrawer(
                     selected = false,
                     onClick = { onSignOut() }
                 )
+                NavigationDrawerItem(
+                    label = {
+                        Row(modifier = Modifier.padding(horizontal = 12.dp)) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "delete all diaries"
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Delete all diaries",
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    },
+                    selected = false,
+                    onClick = { onDeleteAllDiariesClicked() }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 NavigationDrawerItem(
                     label = {
                         Row(modifier = Modifier.padding(horizontal = 12.dp)) {

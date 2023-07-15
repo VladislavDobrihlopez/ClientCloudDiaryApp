@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForDeletionDao
-import com.example.yourdiabetesdiary.data.database.ImageInQueryForUploadingDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
+import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
-import com.example.yourdiabetesdiary.data.repository.MongoDbDbRepositoryImpl
+import com.example.yourdiabetesdiary.data.repositoryImpl.MongoDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem
@@ -63,7 +63,7 @@ class CompositionViewModel @Inject constructor(
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
-                MongoDbDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
+                MongoDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
                     .catch { ex ->
                         emit(RequestState.Error(IllegalStateException("Diary already deleted")))
                     }
@@ -162,7 +162,7 @@ class CompositionViewModel @Inject constructor(
 
     fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            MongoDbDbRepositoryImpl.upsertEntry(diary.apply {
+            MongoDbRepositoryImpl.upsertEntry(diary.apply {
                 _uiState.value.date?.let { updatedOrScreenOpeningTime ->
                     this.date = updatedOrScreenOpeningTime.toRealmInstant()
                 }
@@ -190,27 +190,26 @@ class CompositionViewModel @Inject constructor(
 
     fun deleteDiary(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            MongoDbDbRepositoryImpl.deleteDiary(diaryId = ObjectId(uiState.value.selectedDiaryEntryId!!))
-                .collect { result ->
-                    Log.d("TEST_DELETING", "$result")
-                    when (result) {
-                        is RequestState.Success -> {
-                            uiState.value.selectedDiaryEntryId?.let {
-                                deleteImagesRelatedToDiary(remoteUris = galleryState.value.images.map { it.remotePath })
-                            }
-                            withContext(Dispatchers.Main) {
-                                onSuccess()
-                            }
-                        }
-
-                        is RequestState.Error ->
-                            withContext(Dispatchers.Main) {
-                                onFailure(result.ex.message.toString())
-                            }
-
-                        else -> onFailure("Unexpected problem occurred")
+            val result =
+                MongoDbRepositoryImpl.deleteDiary(diaryId = ObjectId(uiState.value.selectedDiaryEntryId!!))
+            Log.d("TEST_DELETING", "$result")
+            when (result) {
+                is RequestState.Success -> {
+                    uiState.value.selectedDiaryEntryId?.let {
+                        deleteImagesRelatedToDiary(remoteUris = galleryState.value.images.map { it.remotePath })
+                    }
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
                     }
                 }
+
+                is RequestState.Error ->
+                    withContext(Dispatchers.Main) {
+                        onFailure(result.ex.message.toString())
+                    }
+
+                else -> onFailure("Unexpected problem occurred")
+            }
         }
     }
 

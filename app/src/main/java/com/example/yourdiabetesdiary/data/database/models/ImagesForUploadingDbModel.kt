@@ -2,9 +2,9 @@ package com.example.yourdiabetesdiary.data.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.yourdiabetesdiary.data.LocalDataSource
+import com.example.yourdiabetesdiary.data.LocalDataSourceConstants
 
-@Entity(tableName = LocalDataSource.imagesForUploadingEntityName)
+@Entity(tableName = LocalDataSourceConstants.imagesForUploadingEntityName)
 data class ImagesForUploadingDbModel(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

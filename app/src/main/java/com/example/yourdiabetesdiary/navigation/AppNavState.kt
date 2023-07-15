@@ -7,15 +7,24 @@ import androidx.navigation.compose.rememberNavController
 
 class AppNavState(private val navController: NavController) {
     fun navigateToHome() {
-        navController.popBackStack()
         navController.navigate(Screen.Home.route)
     }
 
     fun navigateToCompose(diaryId: String = "") {
         if (diaryId.isEmpty()) {
-            navController.navigate(Screen.DiaryEntry.route)
+            navController.navigate(Screen.DiaryEntry.route) {
+                launchSingleTop = true
+                popUpTo(Screen.Home.route) {
+                    saveState = true
+                }
+            }
         } else {
-            navController.navigate(Screen.DiaryEntry.passArgs(diaryId))
+            navController.navigate(Screen.DiaryEntry.passArgs(diaryId)) {
+                launchSingleTop = true
+                popUpTo(Screen.Home.route) {
+                    saveState = true
+                }
+            }
         }
     }
 
@@ -26,6 +35,9 @@ class AppNavState(private val navController: NavController) {
 
     fun navigateBack() {
         navController.popBackStack()
+        navController.navigate(Screen.Home.route) {
+            restoreState = true
+        }
     }
 }
 
