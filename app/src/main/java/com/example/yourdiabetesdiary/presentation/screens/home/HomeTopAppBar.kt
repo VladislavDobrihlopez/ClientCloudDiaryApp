@@ -13,9 +13,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.maxkeppeker.sheets.core.models.base.SheetState
+import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
@@ -28,9 +27,7 @@ fun HomeTopAppBar(
     onNavigationMenuClicked: () -> Unit,
     onFilterClicked: (LocalDate?) -> Unit
 ) {
-    val datePickerState = remember {
-        SheetState()
-    }
+    val datePickerState = rememberSheetState()
 
     val isInFiltrationMode = rememberSaveable {
         mutableStateOf(false)
