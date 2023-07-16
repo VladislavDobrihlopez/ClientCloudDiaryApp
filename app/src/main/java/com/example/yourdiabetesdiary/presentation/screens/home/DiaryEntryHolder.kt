@@ -47,10 +47,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
-import com.example.yourdiabetesdiary.presentation.components.Gallery
-import com.example.yourdiabetesdiary.ui.theme.Elevation
+import com.example.ui.components.Gallery
+import com.example.ui.theme.Elevation
 import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
 import com.example.yourdiabetesdiary.util.toInstant
 import io.realm.kotlin.ext.realmListOf

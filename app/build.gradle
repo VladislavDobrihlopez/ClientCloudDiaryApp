@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace 'com.example.yourdiabetesdiary'
-    compileSdk 33
+    compileSdk ProjectConfiguration.compileSdk
 
     defaultConfig {
         applicationId "com.example.yourdiabetesdiary"
-        minSdk 24
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        minSdk ProjectConfiguration.minSdk
+        targetSdk ProjectConfiguration.targetSdk
+        versionCode ProjectConfiguration.versionCode
+        versionName ProjectConfiguration.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -42,7 +42,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+        kotlinCompilerExtensionVersion ProjectConfiguration.extensionVersion
     }
     packagingOptions {
         resources {
@@ -66,7 +66,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation libs.navigation.compose
 
     // Firebase
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
@@ -115,4 +115,6 @@ dependencies {
 
     // Desugar JDK
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.0'
+
+    implementation(project(":core:ui"))
 }

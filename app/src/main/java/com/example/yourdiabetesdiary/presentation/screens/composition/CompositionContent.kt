@@ -46,8 +46,8 @@ import coil.request.ImageRequest
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
-import com.example.yourdiabetesdiary.presentation.components.GalleryUploader
-import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.ui.components.GalleryUploader
+import com.example.ui.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState

@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.ui.theme
+package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.components
+package com.example.ui.components
 
 import android.net.Uri
 import android.util.Log
@@ -14,10 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +28,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.yourdiabetesdiary.models.GalleryItem
-import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.ui.components.custom_states.GalleryState
 
 @Composable
 fun GalleryUploader(

@@ -23,7 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.models.Mood
-import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
+import com.example.ui.components.CustomAlertDialog
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen

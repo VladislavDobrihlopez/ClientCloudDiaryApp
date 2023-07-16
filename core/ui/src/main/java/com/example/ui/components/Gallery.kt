@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.components
+package com.example.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.ui.theme.Elevation
+import com.example.ui.R
+import com.example.ui.theme.Elevation
 import java.lang.Integer.max
 
 @Composable

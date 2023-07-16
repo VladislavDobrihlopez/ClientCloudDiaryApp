@@ -17,7 +17,7 @@ import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.yourdiabetesdiary.models.Mood
 import com.example.yourdiabetesdiary.navigation.Screen
-import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.ui.components.custom_states.GalleryState
 import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
 import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
-import org.mongodb.kbson.ObjectId
 import java.time.Instant
 import java.time.ZonedDateTime
 import javax.inject.Inject

@@ -1,11 +1,10 @@
-package com.example.yourdiabetesdiary.presentation.components.custom_states
+package com.example.ui.components.custom_states
 
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.yourdiabetesdiary.models.GalleryItem
-import kotlin.random.Random
 
 class GalleryState {
     private val _images = mutableListOf<GalleryItem>()

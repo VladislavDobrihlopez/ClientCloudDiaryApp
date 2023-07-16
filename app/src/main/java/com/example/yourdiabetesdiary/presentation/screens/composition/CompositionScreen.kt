@@ -22,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import com.example.yourdiabetesdiary.models.DiaryEntry
 import com.example.yourdiabetesdiary.models.GalleryItem
-import com.example.yourdiabetesdiary.presentation.components.CustomAlertDialog
-import com.example.yourdiabetesdiary.presentation.components.ZoomableImage
-import com.example.yourdiabetesdiary.presentation.components.custom_states.GalleryState
+import com.example.ui.components.CustomAlertDialog
+import com.example.ui.components.ZoomableImage
+import com.example.ui.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import java.time.Instant

@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.components
+package com.example.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -32,8 +32,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.ui.theme.YourDiabetesDiaryTheme
+import com.example.ui.R
+import com.example.ui.theme.YourDiabetesDiaryTheme
 
 @Composable
 fun GoogleButton(

@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.presentation.components.DateHeader
+import com.example.ui.components.DateHeader
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)

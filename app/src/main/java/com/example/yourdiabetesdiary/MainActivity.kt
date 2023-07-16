@@ -14,7 +14,7 @@ import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDa
 import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
 import com.example.yourdiabetesdiary.navigation.Screen
 import com.example.yourdiabetesdiary.navigation.SetupNavHost
-import com.example.yourdiabetesdiary.ui.theme.YourDiabetesDiaryTheme
+import com.example.ui.theme.YourDiabetesDiaryTheme
 import com.example.yourdiabetesdiary.util.Constants
 import com.example.yourdiabetesdiary.util.retryDeletingImage
 import com.example.yourdiabetesdiary.util.retryUploadingImage

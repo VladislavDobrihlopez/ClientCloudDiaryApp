@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.components
+package com.example.ui.components
 
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
