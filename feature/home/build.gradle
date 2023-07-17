@@ -1,0 +1,67 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'io.realm.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    namespace 'com.example.home'
+    compileSdk ProjectConfiguration.compileSdk
+
+    defaultConfig {
+        minSdk ProjectConfiguration.minSdk
+        targetSdk ProjectConfiguration.targetSdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion ProjectConfiguration.extensionVersion
+    }
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+}
+
+dependencies {
+    implementation libs.activity.compose
+    implementation libs.material3.compose
+    implementation libs.navigation.compose
+    implementation libs.coil
+    implementation libs.accompanist.pager
+    implementation libs.coroutines.core
+    implementation libs.realm.sync
+    implementation libs.date.time.picker
+    implementation libs.date.dialog
+    implementation libs.time.dialog
+    implementation libs.hilt.android
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    kapt libs.hilt.compiler
+    implementation libs.hilt.navigation.compose
+    implementation libs.firebase.auth
+    implementation libs.firebase.storage
+    implementation libs.compose.tooling.preview
+
+    implementation(project(":core:utils"))
+    implementation(project(":core:ui"))
+    implementation(project(":data:realm_atlas"))
+}

@@ -17,3 +17,9 @@ dependencyResolutionManagement {
 }
 rootProject.name = "YourDiabetesDiary"
 include ':app'
+include ':core:ui'
+include ':core:utils'
+include ':data:realm_atlas'
+include ':feature:auth'
+include ':feature:home'
+include ':feature:composition'
