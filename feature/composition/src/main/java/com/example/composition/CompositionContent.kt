@@ -103,7 +103,6 @@ internal fun CompositionContent(
         ) {
             val bunchOfMoods = rememberSaveable {
                 val moods = Mood.values()
-                //moods.shuffle()
                 mutableStateOf(moods)
             }
 
@@ -132,7 +131,8 @@ internal fun CompositionContent(
                     focusedIndicatorColor = Color.Unspecified,
                     disabledIndicatorColor = Color.Unspecified,
                     unfocusedIndicatorColor = Color.Unspecified,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = {
@@ -157,7 +157,8 @@ internal fun CompositionContent(
                     focusedIndicatorColor = Color.Unspecified,
                     disabledIndicatorColor = Color.Unspecified,
                     unfocusedIndicatorColor = Color.Unspecified,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onNext = {

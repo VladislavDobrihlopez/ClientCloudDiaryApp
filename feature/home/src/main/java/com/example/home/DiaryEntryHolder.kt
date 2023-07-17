@@ -49,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ui.components.Gallery
 import com.example.ui.theme.Elevation
+import com.example.util.models.DiaryEntry
 import com.example.util.retrieveImagesFromFirebaseStorage
 import com.example.util.toInstant
 import io.realm.kotlin.ext.realmListOf
@@ -60,7 +61,7 @@ import java.util.Locale
 private val DEFAULT_LINE_HEIGHT = 14.dp
 
 @Composable
-internal fun DiaryEntryHolder(entry: com.example.util.models.DiaryEntry, onClick: (String) -> Unit) {
+internal fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
     val localDensity = LocalDensity.current
     val context = LocalContext.current
     val componentHeight = remember {
