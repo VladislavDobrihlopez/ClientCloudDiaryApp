@@ -14,28 +14,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.yourdiabetesdiary.domain.RequestState
+import com.example.auth.navigation.authenticationRoute
 import com.example.ui.components.CustomAlertDialog
+import com.example.util.Constants
+import com.example.util.RequestState
 import com.example.util.Screen
-import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
-import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
+import com.example.util.getImageType
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionViewModel
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeScreen
 import com.example.yourdiabetesdiary.presentation.screens.home.HomeViewModel
-import com.example.yourdiabetesdiary.util.Constants
-import com.example.yourdiabetesdiary.util.getImageType
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
-import com.stevdzasan.messagebar.rememberMessageBarState
-import com.stevdzasan.onetap.rememberOneTapSignInState
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
@@ -75,56 +71,6 @@ fun SetupNavHost(
         diaryRoute(navigateBack = {
             navigationState.navigateBack()
         })
-    }
-}
-
-private fun NavGraphBuilder.authenticationRoute(
-    keepSplashScreen: (Boolean) -> Unit,
-    navigateToHome: () -> Unit
-) {
-    composable(route = Screen.Authentication.route) {
-        val viewModel: AuthenticationViewModel = viewModel()
-        val isUserSignedIn = viewModel.authenticationState
-        val loadingState = viewModel.loadingState
-        val oneTapState = rememberOneTapSignInState()
-        val authResultState = rememberMessageBarState()
-
-        AuthenticationScreen(
-            authenticated = isUserSignedIn.value,
-            onScreenIsReady = {
-                keepSplashScreen(false)
-            },
-            oneTapState = oneTapState,
-            authResultState = authResultState,
-            onButtonClick = {
-                oneTapState.open()
-                viewModel.setLoading(true)
-            },
-            onSuccessfulFirebaseSignIn = { token ->
-                Log.d("MONGO_ATLAS", token)
-                viewModel.signInWithMongoAtlas(
-                    token = token,
-                    onSuccess = {
-                        authResultState.addSuccess("Successfully authorized")
-                    },
-                    onError = { error ->
-                        Log.d("MONGO_ATLAS", error.message.toString())
-                        authResultState.addError(Exception(error))
-                    })
-            },
-            onFailedSignIn = { ex ->
-                authResultState.addError(Exception("Auth error: ${ex.message}"))
-                viewModel.setLoading(false)
-            },
-            onReceivingDismissed = { cause ->
-                authResultState.addError(Exception(cause))
-                viewModel.setLoading(false)
-            },
-            loadingState = loadingState.value,
-            navigateToHome = {
-                navigateToHome()
-            }
-        )
     }
 }
 

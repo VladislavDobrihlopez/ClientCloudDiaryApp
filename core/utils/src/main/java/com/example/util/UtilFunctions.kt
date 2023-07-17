@@ -2,9 +2,7 @@ package com.example.util
 
 import android.content.Context
 import android.net.Uri
-import androidx.core.net.toUri
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storageMetadata
 import io.realm.kotlin.types.RealmInstant
 import java.time.Instant
 
@@ -53,39 +51,4 @@ fun retrieveImagesFromFirebaseStorage(
             }
             .addOnFailureListener(onFailure)
     }
-}
-
-fun retryUploadingImage(
-    image: ImagesForUploadingDbModel,
-    whetherSuccessfullyCompleted: (Boolean) -> Unit
-) {
-    val reference = FirebaseStorage.getInstance().reference
-    reference.child(image.remotePath)
-        // firebase documentation
-        .putFile(
-            image.localUri.toUri(),
-            storageMetadata { },
-            image.sessionUri.toUri()
-        )
-        .addOnSuccessListener {
-            whetherSuccessfullyCompleted(true)
-        }
-        .addOnFailureListener {
-            whetherSuccessfullyCompleted(false)
-        }
-}
-
-fun retryDeletingImage(
-    image: ImagesForDeletionDbModel,
-    whetherSuccessfullyCompleted: (Boolean) -> Unit
-) {
-    val reference = FirebaseStorage.getInstance().reference
-    reference.child(image.remotePath)
-        .delete()
-        .addOnSuccessListener {
-            whetherSuccessfullyCompleted(true)
-        }
-        .addOnFailureListener {
-            whetherSuccessfullyCompleted(false)
-        }
 }

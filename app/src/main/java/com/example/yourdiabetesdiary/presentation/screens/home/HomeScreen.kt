@@ -41,9 +41,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.example.realm_atlas.DiariesType
+import com.example.util.RequestState
 import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.domain.DiariesType
-import com.example.yourdiabetesdiary.domain.RequestState
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)

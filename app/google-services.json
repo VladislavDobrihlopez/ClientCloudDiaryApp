@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "861049012181",
+    "project_id": "diabetesdiaryapp",
+    "storage_bucket": "diabetesdiaryapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861049012181:android:4a3935aea94fb9bb61075c",
+        "android_client_info": {
+          "package_name": "com.example.yourdiabetesdiary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "861049012181-qpo1evafn25vkplhkuf334n1lp4ogf8e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiXAcqqkh3K8KF3sBQetTGnCVBwJH_h7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "861049012181-i3h37olovefcugt90e3fvb74vc1ii1fd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

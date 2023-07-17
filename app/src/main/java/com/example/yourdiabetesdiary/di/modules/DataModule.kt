@@ -2,8 +2,8 @@ package com.example.yourdiabetesdiary.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.example.yourdiabetesdiary.data.LocalDataSourceConstants
-import com.example.yourdiabetesdiary.data.database.ImagesDb
+import com.example.realm_atlas.LocalDataSourceConstants
+import com.example.realm_atlas.database.ImagesDb
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,15 +19,15 @@ object DataModule {
     fun provideDatabase(@ApplicationContext context: Context) =
         Room.databaseBuilder(
             context,
-            ImagesDb::class.java,
-            LocalDataSourceConstants.imagesForUploadingDbName
+            com.example.realm_atlas.database.ImagesDb::class.java,
+            com.example.realm_atlas.LocalDataSourceConstants.imagesForUploadingDbName
         ).build()
 
     @Singleton
     @Provides
-    fun provideUploadingDao(db: ImagesDb) = db.imageInQueryForUploadingDaoService()
+    fun provideUploadingDao(db: com.example.realm_atlas.database.ImagesDb) = db.imageInQueryForUploadingDaoService()
 
     @Singleton
     @Provides
-    fun provideDeletionDao(db: ImagesDb) = db.imageInQueryForDeletionDaoService()
+    fun provideDeletionDao(db: com.example.realm_atlas.database.ImagesDb) = db.imageInQueryForDeletionDaoService()
 }

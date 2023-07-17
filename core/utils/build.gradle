@@ -1,6 +1,9 @@
 plugins {
+    id 'kotlin-kapt'
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
+    id 'io.realm.kotlin'
 }
 
 android {
@@ -22,9 +25,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures {
         compose true
@@ -33,7 +35,12 @@ android {
         kotlinCompilerExtensionVersion ProjectConfiguration.extensionVersion
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
@@ -44,6 +51,7 @@ dependencies {
     implementation libs.coroutines.core
     implementation libs.activity.compose
     implementation libs.material3.compose
-    implementation libs.desugar.jdk
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
     implementation(project(":core:ui"))
 }

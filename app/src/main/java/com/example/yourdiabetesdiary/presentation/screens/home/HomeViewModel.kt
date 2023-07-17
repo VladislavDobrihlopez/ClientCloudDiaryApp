@@ -5,13 +5,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
-import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
+import com.example.realm_atlas.DiariesType
+import com.example.util.RequestState
 import com.example.util.connectivity.ConnectivityObserver
-import com.example.yourdiabetesdiary.domain.DiariesType
-import com.example.yourdiabetesdiary.domain.MongoDbRepository
-import com.example.yourdiabetesdiary.domain.RequestState
-import com.example.yourdiabetesdiary.domain.exceptions.CustomException
+import com.example.util.exceptions.CustomException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val connectivity: ConnectivityObserver,
-    private val remoteDb: MongoDbRepository,
-    private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
+    private val remoteDb: com.example.realm_atlas.MongoDbRepository,
+    private val pendingImagesForDeletionDao: com.example.realm_atlas.database.dao.ImageInQueryForDeletionDao
 ) : ViewModel() {
     val diaries: MutableState<RequestState<DiariesType>> = mutableStateOf(RequestState.Idle)
     private val connectivityStatus =
@@ -86,7 +83,7 @@ class HomeViewModel @Inject constructor(
                             .addOnFailureListener { ex ->
                                 viewModelScope.launch(Dispatchers.IO) {
                                     pendingImagesForDeletionDao.addImage(
-                                        model = ImagesForDeletionDbModel(
+                                        model = com.example.realm_atlas.database.models.ImagesForDeletionDbModel(
                                             remotePath = image.path
                                         )
                                     )

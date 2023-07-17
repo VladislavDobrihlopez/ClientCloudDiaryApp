@@ -46,12 +46,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.util.models.DiaryEntry
-import com.example.util.models.Mood
 import com.example.ui.components.Gallery
 import com.example.ui.theme.Elevation
-import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
-import com.example.yourdiabetesdiary.util.toInstant
+import com.example.util.retrieveImagesFromFirebaseStorage
+import com.example.util.toInstant
 import io.realm.kotlin.ext.realmListOf
 import java.text.SimpleDateFormat
 import java.time.Instant

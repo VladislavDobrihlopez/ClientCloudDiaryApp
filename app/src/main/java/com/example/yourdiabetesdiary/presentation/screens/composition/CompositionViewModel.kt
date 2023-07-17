@@ -7,18 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
-import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
-import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
-import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
-import com.example.yourdiabetesdiary.data.repositoryImpl.MongoDbRepositoryImpl
-import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.ui.components.GalleryItem
-import com.example.util.Screen
 import com.example.ui.components.custom_states.GalleryState
-import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
-import com.example.yourdiabetesdiary.util.toInstant
-import com.example.yourdiabetesdiary.util.toRealmInstant
+import com.example.util.RequestState
+import com.example.util.Screen
+import com.example.util.retrieveImagesFromFirebaseStorage
+import com.example.util.toInstant
+import com.example.util.toRealmInstant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +22,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 import java.time.Instant
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -34,8 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CompositionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val pendingImagesForUploadingDao: ImageInQueryForUploadingDao,
-    private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
+    private val pendingImagesForUploadingDao: com.example.realm_atlas.database.dao.ImageInQueryForUploadingDao,
+    private val pendingImagesForDeletionDao: com.example.realm_atlas.database.dao.ImageInQueryForDeletionDao
 ) : ViewModel() {
     private val _uiState = mutableStateOf(CompositionScreenState())
     val uiState: State<CompositionScreenState>
@@ -60,7 +56,7 @@ class CompositionViewModel @Inject constructor(
         viewModelScope.launch {
             if (isInEditMode()) {
                 val id = _uiState.value.selectedDiaryEntryId
-                MongoDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
+                com.example.realm_atlas.repositoryImpl.MongoDbRepositoryImpl.pullDiary(org.mongodb.kbson.ObjectId(id!!))
                     .catch { ex ->
                         emit(RequestState.Error(IllegalStateException("Diary already deleted")))
                     }
@@ -141,7 +137,7 @@ class CompositionViewModel @Inject constructor(
                             val sessionUri = session.uploadSessionUri
                             if (sessionUri != null) {
                                 pendingImagesForUploadingDao.addImage(
-                                    model = ImagesForUploadingDbModel(
+                                    model = com.example.realm_atlas.database.models.ImagesForUploadingDbModel(
                                         localUri = image.localUri.toString(),
                                         remotePath = image.remotePath,
                                         sessionUri = sessionUri.toString()
@@ -164,7 +160,7 @@ class CompositionViewModel @Inject constructor(
 
     fun storeDiary(diary: com.example.util.models.DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            MongoDbRepositoryImpl.upsertEntry(diary.apply {
+            com.example.realm_atlas.repositoryImpl.MongoDbRepositoryImpl.upsertEntry(diary.apply {
                 _uiState.value.date?.let { updatedOrScreenOpeningTime ->
                     this.date = updatedOrScreenOpeningTime.toRealmInstant()
                 }
@@ -193,7 +189,7 @@ class CompositionViewModel @Inject constructor(
     fun deleteDiary(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val result =
-                MongoDbRepositoryImpl.deleteDiary(diaryId = ObjectId(uiState.value.selectedDiaryEntryId!!))
+                com.example.realm_atlas.repositoryImpl.MongoDbRepositoryImpl.deleteDiary(diaryId = ObjectId(uiState.value.selectedDiaryEntryId!!))
             Log.d("TEST_DELETING", "$result")
             when (result) {
                 is RequestState.Success -> {
@@ -223,7 +219,7 @@ class CompositionViewModel @Inject constructor(
                 .addOnFailureListener {
                     viewModelScope.launch(Dispatchers.IO) {
                         pendingImagesForDeletionDao.addImage(
-                            model = ImagesForDeletionDbModel(
+                            model = com.example.realm_atlas.database.models.ImagesForDeletionDbModel(
                                 remotePath = path
                             )
                         )
