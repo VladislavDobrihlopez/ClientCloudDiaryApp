@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.screens.home
+package com.example.home
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -42,8 +42,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.realm_atlas.DiariesType
+import com.example.ui.R
 import com.example.util.RequestState
-import com.example.yourdiabetesdiary.R
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)

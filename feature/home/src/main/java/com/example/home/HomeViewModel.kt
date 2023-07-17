@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.screens.home
+package com.example.home
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -6,6 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.realm_atlas.DiariesType
+import com.example.realm_atlas.MongoDbRepository
+import com.example.realm_atlas.database.dao.ImageInQueryForDeletionDao
+import com.example.realm_atlas.database.models.ImagesForDeletionDbModel
 import com.example.util.RequestState
 import com.example.util.connectivity.ConnectivityObserver
 import com.example.util.exceptions.CustomException
@@ -20,8 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val connectivity: ConnectivityObserver,
-    private val remoteDb: com.example.realm_atlas.MongoDbRepository,
-    private val pendingImagesForDeletionDao: com.example.realm_atlas.database.dao.ImageInQueryForDeletionDao
+    private val remoteDb: MongoDbRepository,
+    private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
 ) : ViewModel() {
     val diaries: MutableState<RequestState<DiariesType>> = mutableStateOf(RequestState.Idle)
     private val connectivityStatus =
@@ -83,7 +86,7 @@ class HomeViewModel @Inject constructor(
                             .addOnFailureListener { ex ->
                                 viewModelScope.launch(Dispatchers.IO) {
                                     pendingImagesForDeletionDao.addImage(
-                                        model = com.example.realm_atlas.database.models.ImagesForDeletionDbModel(
+                                        model = ImagesForDeletionDbModel(
                                             remotePath = image.path
                                         )
                                     )

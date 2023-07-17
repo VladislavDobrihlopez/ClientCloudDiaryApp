@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.screens.home
+package com.example.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear

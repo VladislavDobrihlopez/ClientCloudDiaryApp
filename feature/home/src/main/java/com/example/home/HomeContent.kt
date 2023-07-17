@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.screens.home
+package com.example.home
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -27,7 +27,7 @@ import java.time.LocalDate
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    diariesOnSpecificDate: Map<LocalDate, List<com.example.util.models.DiaryEntry>>,
+    diariesOnSpecificDate: Map<LocalDate, List<DiaryEntry>>,
     onDiaryClick: (String) -> Unit
 ) {
     if (diariesOnSpecificDate.isNotEmpty()) {

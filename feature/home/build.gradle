@@ -2,10 +2,12 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'io.realm.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
-    namespace 'com.example.auth'
+    namespace 'com.example.home'
     compileSdk ProjectConfiguration.compileSdk
 
     defaultConfig {
@@ -44,11 +46,18 @@ dependencies {
     implementation libs.activity.compose
     implementation libs.material3.compose
     implementation libs.navigation.compose
-    implementation libs.one.tap.compose
-    implementation libs.message.bar.compose
-    implementation libs.firebase.auth
     implementation libs.coroutines.core
     implementation libs.realm.sync
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.navigation.compose
+    implementation libs.compose.tooling.preview
+    implementation libs.date.time.picker
+    implementation libs.date.dialog
+    implementation libs.firebase.auth
+    implementation libs.firebase.storage
+
     implementation(project(":core:utils"))
     implementation(project(":core:ui"))
+    implementation(project(":data:realm_atlas"))
 }

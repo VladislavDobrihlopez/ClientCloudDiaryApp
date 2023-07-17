@@ -3,7 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'io.realm.kotlin'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -32,9 +31,7 @@ android {
         jvmTarget = '17'
     }
     packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
+        resources.excludes.add("META-INF/*")
     }
 }
 

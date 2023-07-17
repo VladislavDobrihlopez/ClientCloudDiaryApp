@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.presentation.screens.home
+package com.example.home
 
 import android.net.Uri
 import android.util.Log
