@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
-import com.example.yourdiabetesdiary.domain.ConnectivityObserver
+import com.example.util.connectivity.ConnectivityObserver
 import com.example.yourdiabetesdiary.domain.DiariesType
 import com.example.yourdiabetesdiary.domain.MongoDbRepository
 import com.example.yourdiabetesdiary.domain.RequestState

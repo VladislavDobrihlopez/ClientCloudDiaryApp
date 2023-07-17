@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForDeletionDao
 import com.example.yourdiabetesdiary.data.database.dao.ImageInQueryForUploadingDao
-import com.example.yourdiabetesdiary.navigation.Screen
+import com.example.util.Screen
 import com.example.yourdiabetesdiary.navigation.SetupNavHost
 import com.example.ui.theme.YourDiabetesDiaryTheme
 import com.example.yourdiabetesdiary.util.Constants

@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.models
+package com.example.util.models
 
 import androidx.compose.ui.graphics.Color
 import com.example.ui.theme.AngryColor
@@ -17,8 +17,7 @@ import com.example.ui.theme.ShamefulColor
 import com.example.ui.theme.SurprisedColor
 import com.example.ui.theme.SuspiciousColor
 import com.example.ui.theme.TenseColor
-import com.example.yourdiabetesdiary.R
-import com.example.yourdiabetesdiary.ui.theme.*
+import com.example.utils.R
 
 enum class Mood(
     val icon: Int,

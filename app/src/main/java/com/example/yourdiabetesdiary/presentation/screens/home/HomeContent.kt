@@ -18,7 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.util.models.DiaryEntry
 import com.example.ui.components.DateHeader
 import java.time.LocalDate
 
@@ -27,12 +27,12 @@ import java.time.LocalDate
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    diariesOnSpecificDate: Map<LocalDate, List<DiaryEntry>>,
+    diariesOnSpecificDate: Map<LocalDate, List<com.example.util.models.DiaryEntry>>,
     onDiaryClick: (String) -> Unit
 ) {
     if (diariesOnSpecificDate.isNotEmpty()) {
         LazyColumn(modifier = modifier.padding(24.dp)) {
-            diariesOnSpecificDate.forEach { date, diaries ->
+            diariesOnSpecificDate.forEach { (date, diaries) ->
                 stickyHeader(key = date) {
                     DateHeader(localDate = date)
                 }

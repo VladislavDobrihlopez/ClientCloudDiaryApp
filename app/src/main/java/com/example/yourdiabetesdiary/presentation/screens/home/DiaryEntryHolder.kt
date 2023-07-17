@@ -46,8 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.models.Mood
+import com.example.util.models.DiaryEntry
+import com.example.util.models.Mood
 import com.example.ui.components.Gallery
 import com.example.ui.theme.Elevation
 import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
@@ -61,7 +61,7 @@ import java.util.Locale
 private val DEFAULT_LINE_HEIGHT = 14.dp
 
 @Composable
-fun DiaryEntryHolder(entry: DiaryEntry, onClick: (String) -> Unit) {
+fun DiaryEntryHolder(entry: com.example.util.models.DiaryEntry, onClick: (String) -> Unit) {
     val localDensity = LocalDensity.current
     val context = LocalContext.current
     val componentHeight = remember {
@@ -186,8 +186,8 @@ private fun ShouldDisplayOnOffSwitch(isDisplayed: State<Boolean>, onClick: () ->
 }
 
 @Composable
-private fun DiaryHeader(diary: DiaryEntry, time: Instant) {
-    val entry = Mood.valueOf(diary.mood)
+private fun DiaryHeader(diary: com.example.util.models.DiaryEntry, time: Instant) {
+    val entry = com.example.util.models.Mood.valueOf(diary.mood)
     val containerColor by remember { mutableStateOf(entry.containerColor) }
     val contentColor by remember { mutableStateOf(entry.contentColor) }
     val iconResId by remember { mutableStateOf(entry.icon) }
@@ -228,10 +228,10 @@ private fun DiaryHeader(diary: DiaryEntry, time: Instant) {
 @Preview()
 @Composable
 fun DiaryEntryHolderPreview() {
-    DiaryEntryHolder(entry = DiaryEntry().apply {
+    DiaryEntryHolder(entry = com.example.util.models.DiaryEntry().apply {
         title = "breakfast"
         description = "I've eaten 5 bread units in the morning, injured 12 units of novorapid"
-        mood = Mood.Calm.name
+        mood = com.example.util.models.Mood.Calm.name
         images = realmListOf("", "")
     }, onClick = {})
 }

@@ -1,6 +1,6 @@
-package com.example.yourdiabetesdiary.models
+package com.example.util.models
 
-import com.example.yourdiabetesdiary.util.toRealmInstant
+import com.example.util.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList

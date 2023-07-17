@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.domain
+package com.example.util.connectivity
 
 import kotlinx.coroutines.flow.Flow
 

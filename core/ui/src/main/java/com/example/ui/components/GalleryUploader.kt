@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.example.yourdiabetesdiary.models.GalleryItem
 import com.example.ui.components.custom_states.GalleryState
 
 @Composable
@@ -78,7 +77,7 @@ fun GalleryUploader(
 //                Log.d("TEST_IMAGE_SELECTION", "recomposition: launched effect")
 //                items.value = state.value.images.toList()
 //            }
-            state.value.images.take(numberOfVisibleImages.value).forEachIndexed { index, galleryItem ->
+            state.value.images.take(numberOfVisibleImages.value).forEachIndexed { index: Int, galleryItem: GalleryItem ->
                 Log.d("TEST_IMAGE_SELECTION", "recomposition: ${state.value.images.count()} foreach")
                 AsyncImage(
                     modifier = Modifier

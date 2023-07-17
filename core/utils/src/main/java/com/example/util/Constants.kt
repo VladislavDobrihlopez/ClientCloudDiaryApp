@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.util
+package com.example.util
 
 object Constants {
     const val MONGO_DB_APP_ID = "application-0-hpjem"

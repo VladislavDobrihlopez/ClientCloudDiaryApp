@@ -20,8 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
-import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.models.GalleryItem
+import com.example.ui.components.GalleryItem
 import com.example.ui.components.CustomAlertDialog
 import com.example.ui.components.ZoomableImage
 import com.example.ui.components.custom_states.GalleryState
@@ -43,7 +42,7 @@ fun CompositionScreen(
     onDeleteConfirmed: () -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
-    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit,
+    onSaveDiaryButtonClicked: (com.example.util.models.DiaryEntry) -> Unit,
     onDateUpdated: (ZonedDateTime) -> Unit,
     onDeleteGalleryImage: (GalleryItem) -> Unit
 ) {

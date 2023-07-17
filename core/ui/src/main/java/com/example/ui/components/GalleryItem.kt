@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.models
+package com.example.ui.components
 
 import android.net.Uri
 

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.ui'
+    namespace 'com.example.utils'
     compileSdk ProjectConfiguration.compileSdk
 
     defaultConfig {
@@ -22,11 +22,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
     buildFeatures {
         compose true
@@ -34,13 +32,18 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion ProjectConfiguration.extensionVersion
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
-    implementation libs.compose.ui
+    implementation libs.core.ktx
+    implementation libs.firebase.storage
+    implementation libs.realm.sync
+    implementation libs.coroutines.core
     implementation libs.activity.compose
     implementation libs.material3.compose
-    implementation libs.compose.tooling.preview
-    implementation libs.coil
-//    implementation(project(":core:utils"))
+    implementation libs.desugar.jdk
+    implementation(project(":core:ui"))
 }

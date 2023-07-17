@@ -13,10 +13,8 @@ import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbMod
 import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.example.yourdiabetesdiary.data.repositoryImpl.MongoDbRepositoryImpl
 import com.example.yourdiabetesdiary.domain.RequestState
-import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.models.GalleryItem
-import com.example.yourdiabetesdiary.models.Mood
-import com.example.yourdiabetesdiary.navigation.Screen
+import com.example.ui.components.GalleryItem
+import com.example.util.Screen
 import com.example.ui.components.custom_states.GalleryState
 import com.example.yourdiabetesdiary.util.retrieveImagesFromFirebaseStorage
 import com.example.yourdiabetesdiary.util.toInstant
@@ -117,7 +115,12 @@ class CompositionViewModel @Inject constructor(
         Log.d("ADD_IMAGE", "addImage: $remotePath")
         _galleryState.value =
             GalleryState.setupImagesBasedOnPrevious(galleryState.value).apply {
-                addImage(GalleryItem(remotePath = remotePath, localUri = uri))
+                addImage(
+                    GalleryItem(
+                        remotePath = remotePath,
+                        localUri = uri
+                    )
+                )
             }
     }
 
@@ -159,7 +162,7 @@ class CompositionViewModel @Inject constructor(
         Log.d("TEST_STORING", "queueImageForDeletion: ${_galleryState.value}")
     }
 
-    fun storeDiary(diary: DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun storeDiary(diary: com.example.util.models.DiaryEntry, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             MongoDbRepositoryImpl.upsertEntry(diary.apply {
                 _uiState.value.date?.let { updatedOrScreenOpeningTime ->
@@ -238,7 +241,7 @@ class CompositionViewModel @Inject constructor(
     }
 
     fun setNewMood(mood: String) {
-        _uiState.value = _uiState.value.copy(mood = Mood.valueOf(mood))
+        _uiState.value = _uiState.value.copy(mood = com.example.util.models.Mood.valueOf(mood))
     }
 
     fun setNewDate(date: Instant) {

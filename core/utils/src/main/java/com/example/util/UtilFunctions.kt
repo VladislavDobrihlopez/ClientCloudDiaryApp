@@ -1,10 +1,8 @@
-package com.example.yourdiabetesdiary.util
+package com.example.util
 
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import com.example.yourdiabetesdiary.data.database.models.ImagesForDeletionDbModel
-import com.example.yourdiabetesdiary.data.database.models.ImagesForUploadingDbModel
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storageMetadata
 import io.realm.kotlin.types.RealmInstant

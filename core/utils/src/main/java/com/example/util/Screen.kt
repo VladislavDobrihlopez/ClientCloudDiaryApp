@@ -1,4 +1,4 @@
-package com.example.yourdiabetesdiary.navigation
+package com.example.util
 
 sealed class Screen(val route: String) {
     object Home : Screen(HOME_ROUTE)

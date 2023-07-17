@@ -43,9 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.yourdiabetesdiary.models.DiaryEntry
-import com.example.yourdiabetesdiary.models.GalleryItem
-import com.example.yourdiabetesdiary.models.Mood
+import com.example.ui.components.GalleryItem
 import com.example.ui.components.GalleryUploader
 import com.example.ui.components.custom_states.GalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -67,7 +65,7 @@ fun CompositionContent(
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onGalleryImageClicked: (GalleryItem) -> Unit,
-    onSaveDiaryButtonClicked: (DiaryEntry) -> Unit
+    onSaveDiaryButtonClicked: (com.example.util.models.DiaryEntry) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
     val context = LocalContext.current
@@ -102,12 +100,12 @@ fun CompositionContent(
                 .weight(1f)
         ) {
             val bunchOfMoods = rememberSaveable {
-                val moods = Mood.values()
+                val moods = com.example.util.models.Mood.values()
                 //moods.shuffle()
                 mutableStateOf(moods)
             }
 
-            HorizontalPager(state = pagerState, count = Mood.values().size) { page ->
+            HorizontalPager(state = pagerState, count = com.example.util.models.Mood.values().size) { page ->
                 bunchOfMoods.value[page].also { mood ->
                     AsyncImage(
                         modifier = Modifier.size(120.dp),
@@ -184,7 +182,7 @@ fun CompositionContent(
                     .height(54.dp),
                 onClick = {
                     if (title.isNotEmpty() && description.isNotEmpty()) {
-                        onSaveDiaryButtonClicked(DiaryEntry().apply {
+                        onSaveDiaryButtonClicked(com.example.util.models.DiaryEntry().apply {
                             this.title = title.trim()
                             this.description = description.trim()
                         })

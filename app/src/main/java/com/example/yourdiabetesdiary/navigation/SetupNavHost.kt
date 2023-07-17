@@ -22,8 +22,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourdiabetesdiary.domain.RequestState
-import com.example.yourdiabetesdiary.models.Mood
 import com.example.ui.components.CustomAlertDialog
+import com.example.util.Screen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationScreen
 import com.example.yourdiabetesdiary.presentation.screens.auth.AuthenticationViewModel
 import com.example.yourdiabetesdiary.presentation.screens.composition.CompositionScreen
@@ -247,7 +247,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
         Log.d("NEW_STATE", "${entry.date}, ${entry.mood}")
 
         LaunchedEffect(key1 = entry.mood) {
-            pagerState.animateScrollToPage(Mood.valueOf(entry.mood.name).ordinal)
+            pagerState.animateScrollToPage(com.example.util.models.Mood.valueOf(entry.mood.name).ordinal)
         }
 
         val currentPage = remember {
@@ -260,7 +260,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
 
         CompositionScreen(
             date = entry.date,
-            mood = { Mood.values()[currentPage.value].name },
+            mood = { com.example.util.models.Mood.values()[currentPage.value].name },
             pagerState = pagerState,
             screenState = entry,
             navigateBack = navigateBack,
@@ -287,7 +287,7 @@ private fun NavGraphBuilder.diaryRoute(navigateBack: () -> Unit) {
             onSaveDiaryButtonClicked = { diary ->
                 viewModel.storeDiary(
                     diary = diary.apply {
-                        this.mood = Mood.values()[currentPage.value].name
+                        this.mood = com.example.util.models.Mood.values()[currentPage.value].name
                         this._id =
                             if (entry.selectedDiaryEntryId != null) {
                                 ObjectId(entry.selectedDiaryEntryId)

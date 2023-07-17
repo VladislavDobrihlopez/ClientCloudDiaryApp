@@ -5,7 +5,7 @@ import com.example.yourdiabetesdiary.domain.DiariesType
 import com.example.yourdiabetesdiary.domain.MongoDbRepository
 import com.example.yourdiabetesdiary.domain.RequestState
 import com.example.yourdiabetesdiary.domain.exceptions.CustomException
-import com.example.yourdiabetesdiary.models.DiaryEntry
+import com.example.util.models.DiaryEntry
 import com.example.yourdiabetesdiary.util.Constants
 import com.example.yourdiabetesdiary.util.toInstant
 import com.example.yourdiabetesdiary.util.toRealmInstant
@@ -38,10 +38,10 @@ object MongoDbRepositoryImpl : MongoDbRepository {
     override fun configureRealmDb() {
         if (isSessionValid()) {
             val config =
-                SyncConfiguration.Builder(user = currentUser!!, schema = setOf(DiaryEntry::class))
+                SyncConfiguration.Builder(user = currentUser!!, schema = setOf(com.example.util.models.DiaryEntry::class))
                     .initialSubscriptions { subscription ->
                         add(
-                            query = subscription.query<DiaryEntry>("ownerId == $0", currentUser.id),
+                            query = subscription.query<com.example.util.models.DiaryEntry>("ownerId == $0", currentUser.id),
                             name = "Retrieving user's diaries"
                         )
                     }
@@ -54,7 +54,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
     override fun retrieveDiaries(): Flow<RequestState<DiariesType>> {
         return if (isSessionValid()) {
             try {
-                realm.query<DiaryEntry>(query = "ownerId == $0", currentUser!!.id)
+                realm.query<com.example.util.models.DiaryEntry>(query = "ownerId == $0", currentUser!!.id)
                     .sort(property = "date", sortOrder = Sort.DESCENDING)
                     .asFlow()
                     .map { result ->
@@ -87,7 +87,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
                     ZoneId.systemDefault()
                 )
 
-                realm.query<DiaryEntry>(
+                realm.query<com.example.util.models.DiaryEntry>(
                     query = "ownerId == $0 AND date <= $1 AND date >= $2 ",
                     currentUser!!.id,
                     instant.plusDays(1).toInstant().toRealmInstant(),
@@ -116,14 +116,14 @@ object MongoDbRepositoryImpl : MongoDbRepository {
         }
     }
 
-    override suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<DiaryEntry>> {
+    override suspend fun pullDiary(diaryId: ObjectId): Flow<RequestState<com.example.util.models.DiaryEntry>> {
         Log.d("TEST_STORING", "pulled: $diaryId")
 
         return if (isSessionValid()) {
             withContext(Dispatchers.IO) {
                 try {
-                    realm.query<DiaryEntry>("_id == $0", diaryId).find().asFlow().map {
-                        RequestState.Success<DiaryEntry>(data = it.list.first())
+                    realm.query<com.example.util.models.DiaryEntry>("_id == $0", diaryId).find().asFlow().map {
+                        RequestState.Success<com.example.util.models.DiaryEntry>(data = it.list.first())
                     }
                 } catch (e: Exception) {
                     flow {
@@ -138,7 +138,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
         }
     }
 
-    override suspend fun upsertEntry(diaryEntry: DiaryEntry): Flow<RequestState<DiaryEntry>> {
+    override suspend fun upsertEntry(diaryEntry: com.example.util.models.DiaryEntry): Flow<RequestState<com.example.util.models.DiaryEntry>> {
         Log.d("TEST_STORING", "navigated in viewmodel upsertEntry: ${diaryEntry._id}")
 
         return if (isSessionValid()) {
@@ -146,7 +146,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
                 try {
                     try {
                         val queriedDiary = realm.write {
-                            query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first().find()
+                            query<com.example.util.models.DiaryEntry>(query = "_id == $0", diaryEntry._id).first().find()
                         }
                         Log.d(
                             "TEST_STORING",
@@ -159,12 +159,12 @@ object MongoDbRepositoryImpl : MongoDbRepository {
                                 })
                             }
                             flow {
-                                emit(RequestState.Success<DiaryEntry>(data = diaryEntry))
+                                emit(RequestState.Success<com.example.util.models.DiaryEntry>(data = diaryEntry))
                             }
                         } else {
                             realm.write {
                                 val queriedEntry =
-                                    query<DiaryEntry>(query = "_id == $0", diaryEntry._id).first()
+                                    query<com.example.util.models.DiaryEntry>(query = "_id == $0", diaryEntry._id).first()
                                         .find()!!
                                 queriedEntry.apply {
                                     this.title = diaryEntry.title
@@ -175,7 +175,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
                                 }
                             }
                             flow {
-                                emit(RequestState.Success<DiaryEntry>(data = diaryEntry))
+                                emit(RequestState.Success<com.example.util.models.DiaryEntry>(data = diaryEntry))
                             }
                         }
                     } catch (ex: NoSuchElementException) {
@@ -201,7 +201,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
             withContext(Dispatchers.IO) {
                 realm.write {
                     try {
-                        val diary = query<DiaryEntry>(
+                        val diary = query<com.example.util.models.DiaryEntry>(
                             "_id == $0 AND ownerId == $1",
                             diaryId,
                             currentUser!!.id
@@ -230,7 +230,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
             withContext(Dispatchers.IO) {
                 realm.write {
                     try {
-                        val diary = query<DiaryEntry>(
+                        val diary = query<com.example.util.models.DiaryEntry>(
                             "ownerId == $0",
                             currentUser!!.id
                         ).find()

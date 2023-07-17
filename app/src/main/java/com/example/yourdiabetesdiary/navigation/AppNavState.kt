@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.util.Screen
 
 class AppNavState(private val navController: NavController) {
     fun navigateToHome() {
