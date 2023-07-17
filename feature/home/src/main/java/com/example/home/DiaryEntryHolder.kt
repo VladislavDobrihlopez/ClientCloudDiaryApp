@@ -1,5 +1,6 @@
 package com.example.home
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -59,7 +60,7 @@ import java.util.Locale
 private val DEFAULT_LINE_HEIGHT = 14.dp
 
 @Composable
-fun DiaryEntryHolder(entry: com.example.util.models.DiaryEntry, onClick: (String) -> Unit) {
+internal fun DiaryEntryHolder(entry: com.example.util.models.DiaryEntry, onClick: (String) -> Unit) {
     val localDensity = LocalDensity.current
     val context = LocalContext.current
     val componentHeight = remember {
@@ -169,7 +170,7 @@ fun DiaryEntryHolder(entry: com.example.util.models.DiaryEntry, onClick: (String
 }
 
 @Composable
-private fun ShouldDisplayOnOffSwitch(isDisplayed: State<Boolean>, onClick: () -> Unit) {
+internal fun ShouldDisplayOnOffSwitch(isDisplayed: State<Boolean>, onClick: () -> Unit) {
     TextButton(
         onClick = {
             onClick()
@@ -183,8 +184,9 @@ private fun ShouldDisplayOnOffSwitch(isDisplayed: State<Boolean>, onClick: () ->
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
-private fun DiaryHeader(diary: com.example.util.models.DiaryEntry, time: Instant) {
+internal fun DiaryHeader(diary: com.example.util.models.DiaryEntry, time: Instant) {
     val entry = com.example.util.models.Mood.valueOf(diary.mood)
     val containerColor by remember { mutableStateOf(entry.containerColor) }
     val contentColor by remember { mutableStateOf(entry.contentColor) }
@@ -225,7 +227,7 @@ private fun DiaryHeader(diary: com.example.util.models.DiaryEntry, time: Instant
 
 @Preview()
 @Composable
-fun DiaryEntryHolderPreview() {
+internal fun DiaryEntryHolderPreview() {
     DiaryEntryHolder(entry = com.example.util.models.DiaryEntry().apply {
         title = "breakfast"
         description = "I've eaten 5 bread units in the morning, injured 12 units of novorapid"

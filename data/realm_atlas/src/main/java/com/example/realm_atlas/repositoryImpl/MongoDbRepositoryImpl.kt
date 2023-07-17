@@ -1,5 +1,6 @@
 package com.example.realm_atlas.repositoryImpl
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.example.realm_atlas.DiariesType
 import com.example.realm_atlas.MongoDbRepository
@@ -26,7 +27,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-object MongoDbRepositoryImpl : MongoDbRepository {
+internal object MongoDbRepositoryImpl : MongoDbRepository {
     private val app = App.Companion.create(Constants.MONGO_DB_APP_ID)
     private val currentUser = app.currentUser
     private lateinit var realm: Realm
@@ -51,6 +52,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
         }
     }
 
+    @SuppressLint("NewApi")
     override fun retrieveDiaries(): Flow<RequestState<DiariesType>> {
         return if (isSessionValid()) {
             try {
@@ -78,6 +80,7 @@ object MongoDbRepositoryImpl : MongoDbRepository {
         }
     }
 
+    @SuppressLint("NewApi")
     override fun retrieveFilteredDiaries(localDate: LocalDate): Flow<RequestState<DiariesType>> {
         return if (isSessionValid()) {
             try {

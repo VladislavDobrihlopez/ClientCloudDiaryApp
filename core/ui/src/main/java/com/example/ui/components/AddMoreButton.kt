@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ui.theme.Elevation
 
 @Composable
-fun AddMoreButton(
+internal fun AddMoreButton(
     modifier: Modifier = Modifier,
     size: Dp = 32.dp,
     shape: CornerBasedShape,

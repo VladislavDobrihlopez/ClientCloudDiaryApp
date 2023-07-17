@@ -49,7 +49,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(
+internal fun HomeScreen(
     state: RequestState<DiariesType>,
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
@@ -126,7 +126,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun NavigationDrawer(
+internal fun NavigationDrawer(
     drawerState: DrawerState,
     onSignOut: () -> Unit,
     onAboutClicked: () -> Unit,

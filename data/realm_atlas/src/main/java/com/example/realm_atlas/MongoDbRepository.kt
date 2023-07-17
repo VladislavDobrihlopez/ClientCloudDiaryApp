@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import org.mongodb.kbson.ObjectId
 import java.time.LocalDate
 
-typealias DiariesType = Map<LocalDate, List<com.example.util.models.DiaryEntry>>
+typealias DiariesType = Map<LocalDate, List<DiaryEntry>>
 
 interface MongoDbRepository {
     fun configureRealmDb()

@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.util.Screen
 
-class AppNavState(private val navController: NavController) {
+internal class AppNavState(private val navController: NavController) {
     fun navigateToHome() {
         navController.navigate(Screen.Home.route)
     }
@@ -43,7 +43,7 @@ class AppNavState(private val navController: NavController) {
 }
 
 @Composable
-fun rememberNavigationState(navController: NavController = rememberNavController()): AppNavState {
+internal fun rememberNavigationState(navController: NavController = rememberNavController()): AppNavState {
     return remember {
         AppNavState(navController)
     }

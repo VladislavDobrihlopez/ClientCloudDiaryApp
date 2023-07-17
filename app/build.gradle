@@ -119,4 +119,5 @@ dependencies {
     implementation(project(":data:realm_atlas"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:composition"))
 }

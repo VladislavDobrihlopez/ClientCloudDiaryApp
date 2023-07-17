@@ -19,7 +19,7 @@ import com.stevdzasan.onetap.OneTapSignInWithGoogle
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AuthenticationScreen(
+internal fun AuthenticationScreen(
     authenticated: Boolean,
     oneTapState: OneTapSignInState,
     authResultState: MessageBarState,

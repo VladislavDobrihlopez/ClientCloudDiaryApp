@@ -25,7 +25,7 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeContent(
+internal fun HomeContent(
     modifier: Modifier = Modifier,
     diariesOnSpecificDate: Map<LocalDate, List<DiaryEntry>>,
     onDiaryClick: (String) -> Unit
@@ -51,7 +51,7 @@ fun HomeContent(
 }
 
 @Composable
-fun EmptyDataInfo(
+internal fun EmptyDataInfo(
     title: String = "No diaries yet",
     subtitle: String = "Do you mind adding a new one? Tap on the bottom-right button"
 ) {

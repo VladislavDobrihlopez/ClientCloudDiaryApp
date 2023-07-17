@@ -22,7 +22,7 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopAppBar(
+internal fun HomeTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     onNavigationMenuClicked: () -> Unit,
     onFilterClicked: (LocalDate?) -> Unit

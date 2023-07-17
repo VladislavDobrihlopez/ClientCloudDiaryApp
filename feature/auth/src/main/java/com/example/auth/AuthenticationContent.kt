@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ui.components.GoogleButton
 
 @Composable
-fun AuthenticationContent(
+internal fun AuthenticationContent(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     loadingState: Boolean

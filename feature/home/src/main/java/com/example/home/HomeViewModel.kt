@@ -21,7 +21,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+internal class HomeViewModel @Inject constructor(
     private val connectivity: ConnectivityObserver,
     private val remoteDb: MongoDbRepository,
     private val pendingImagesForDeletionDao: ImageInQueryForDeletionDao
