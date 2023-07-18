@@ -1,7 +1,7 @@
 # YourDiabetesDiary
 
 ##Stack
-* Multi module architecture
+* Multi module architecture (feature-based)
 * MVVM
 * Jetpack compose
 * Coroutines
